@@ -4,6 +4,7 @@ import '../../utils/auth_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../creator/creator_dashboard_screen.dart';
+import '../home/manga_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -87,7 +88,10 @@ class _MangaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => MangaDetailScreen(manga: manga)),
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A1A),
