@@ -106,4 +106,43 @@ class FirestoreService {
               .toList();
         });
   }
+
+  Future<void> toggleBookmark(String userId, MangaModel manga) async {
+    final ref = _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('bookmarks')
+        .doc(manga.id);
+    final doc = await ref.get();
+    if (doc.exists) {
+      await ref.delete();
+    } else {
+      await ref.set({
+        'mangaId': manga.id,
+        'title': manga.title,
+        'coverUrl': manga.coverUrl,
+        'totalChapters': manga.totalChapters,
+        'addedAt': DateTime.now().toIso8601String(),
+      });
+    }
+  }
+
+  Future<bool> isBookmarked(String userId, String mangaId) async {
+    final doc = await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('bookmarks')
+        .doc(mangaId)
+        .get();
+    return doc.exists;
+  }
+
+  Stream<List<Map<String, dynamic>>> getBookmarks(String userId) {
+    return _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('bookmarks')
+        .snapshots()
+        .map((snap) => snap.docs.map((d) => d.data()).toList());
+  }
 }
