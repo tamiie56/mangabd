@@ -5,7 +5,6 @@ import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../creator/creator_dashboard_screen.dart';
 import '../home/manga_detail_screen.dart';
-import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,74 +12,139 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final firestoreService = FirestoreService();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text(
-          'MangaBD',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF0D0D0D),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF1A1A1A),
+          title: const Text(
+            'MangaBD',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.5,
+            ),
           ),
-        ),
-        actions: [
-          if (auth.isCreator)
-            IconButton(
-              icon: const Icon(Icons.dashboard, color: Colors.white),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const CreatorDashboardScreen(),
+          actions: [
+            if (auth.isCreator)
+              IconButton(
+                icon: const Icon(Icons.dashboard, color: Colors.white),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CreatorDashboardScreen(),
+                  ),
                 ),
               ),
-            ),
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfileScreen()),
-            ),
+          ],
+          bottom: const TabBar(
+            indicatorColor: Colors.deepPurpleAccent,
+            labelColor: Colors.deepPurpleAccent,
+            unselectedLabelColor: Colors.grey,
+            tabs: [
+              Tab(text: 'For You'),
+              Tab(text: 'Following'),
+            ],
           ),
-        ],
+        ),
+        body: TabBarView(
+          children: [
+            _ForYouTab(),
+            _FollowingTab(userId: auth.user?.uid ?? ''),
+          ],
+        ),
       ),
-      body: StreamBuilder<List<MangaModel>>(
-        stream: firestoreService.getMangas(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.deepPurple),
-            );
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                'No manga yet.\nBe the first to upload!',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            );
-          }
-          final mangas = snapshot.data!;
-          return GridView.builder(
-            padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.65,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: mangas.length,
-            itemBuilder: (context, index) {
-              final manga = mangas[index];
-              return _MangaCard(manga: manga);
-            },
+    );
+  }
+}
+
+class _ForYouTab extends StatelessWidget {
+  final _firestoreService = FirestoreService();
+
+  _ForYouTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<MangaModel>>(
+      stream: _firestoreService.getMangas(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.deepPurple),
           );
-        },
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(
+            child: Text(
+              'No manga yet.\nBe the first to upload!',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          );
+        }
+        return _MangaGrid(mangas: snapshot.data!);
+      },
+    );
+  }
+}
+
+class _FollowingTab extends StatelessWidget {
+  final String userId;
+  final _firestoreService = FirestoreService();
+
+  _FollowingTab({required this.userId});
+
+  @override
+  Widget build(BuildContext context) {
+    if (userId.isEmpty) {
+      return const Center(
+        child: Text('Please login', style: TextStyle(color: Colors.grey)),
+      );
+    }
+
+    return StreamBuilder<List<MangaModel>>(
+      stream: _firestoreService.getFollowingMangas(userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.deepPurple),
+          );
+        }
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(
+            child: Text(
+              'Follow some creators to see their manga here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          );
+        }
+        return _MangaGrid(mangas: snapshot.data!);
+      },
+    );
+  }
+}
+
+class _MangaGrid extends StatelessWidget {
+  final List<MangaModel> mangas;
+  const _MangaGrid({required this.mangas});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.65,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
       ),
+      itemCount: mangas.length,
+      itemBuilder: (context, index) {
+        return _MangaCard(manga: mangas[index]);
+      },
     );
   }
 }
@@ -118,11 +182,8 @@ class _MangaCard extends StatelessWidget {
                     : Container(
                         color: Colors.deepPurple.withOpacity(0.3),
                         child: const Center(
-                          child: Icon(
-                            Icons.menu_book,
-                            color: Colors.deepPurple,
-                            size: 48,
-                          ),
+                          child: Icon(Icons.menu_book,
+                              color: Colors.deepPurple, size: 48),
                         ),
                       ),
               ),
