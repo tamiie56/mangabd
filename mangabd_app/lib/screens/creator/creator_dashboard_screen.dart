@@ -5,6 +5,7 @@ import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import 'add_manga_screen.dart';
 import 'add_chapter_screen.dart';
+import 'edit_manga_screen.dart';
 
 class CreatorDashboardScreen extends StatelessWidget {
   const CreatorDashboardScreen({super.key});
@@ -130,6 +131,76 @@ class CreatorDashboardScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.grey),
+                      color: const Color(0xFF2A2A2A),
+                      onSelected: (value) async {
+                        if (value == 'edit') {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => EditMangaScreen(manga: manga),
+                            ),
+                          );
+                        } else if (value == 'delete') {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                              backgroundColor: const Color(0xFF1A1A1A),
+                              title: const Text(
+                                'Delete Manga',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              content: Text(
+                                '"${manga.title}" permanently delete হবে।',
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text('Cancel',
+                                      style: TextStyle(color: Colors.grey)),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, true),
+                                  child: const Text('Delete',
+                                      style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            ),
+                          );
+                          if (confirm == true) {
+                            await firestoreService.deleteManga(manga.id);
+                          }
+                        }
+                      },
+                      itemBuilder: (_) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Row(
+                            children: [
+                              Icon(Icons.edit, color: Colors.white, size: 18),
+                              SizedBox(width: 8),
+                              Text('Edit',
+                                  style: TextStyle(color: Colors.white)),
+                            ],
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Row(
+                            children: [
+                              Icon(Icons.delete, color: Colors.red, size: 18),
+                              SizedBox(width: 8),
+                              Text('Delete',
+                                  style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

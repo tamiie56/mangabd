@@ -194,4 +194,8 @@ class FirestoreService {
         .snapshots()
         .map((snap) => snap.docs.length);
   }
+
+  Future<void> updateManga(String mangaId, Map<String, dynamic> data) async {
+    await _firestore.collection('mangas').doc(mangaId).update(data);
+  }
 }
