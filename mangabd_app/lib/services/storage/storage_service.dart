@@ -1,39 +1,48 @@
 import 'dart:typed_data';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  static const String _cloudName = 'dbabkcit1';
+  static const String _uploadPreset = 'mangabd_preset';
 
-  // Upload cover image
-  Future<String?> uploadCover(String mangaId, Uint8List imageBytes) async {
+  Future<String?> _uploadImage(Uint8List imageBytes, String folder) async {
     try {
-      final ref = _storage.ref().child('covers/$mangaId.jpg');
-      await ref.putData(imageBytes);
-      return await ref.getDownloadURL();
+      final uri = Uri.parse(
+          'https://api.cloudinary.com/v1_1/$_cloudName/image/upload');
+      final request = http.MultipartRequest('POST', uri);
+      request.fields['upload_preset'] = _uploadPreset;
+      request.fields['folder'] = folder;
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          imageBytes,
+          filename: '${DateTime.now().millisecondsSinceEpoch}.jpg',
+        ),
+      );
+      final response = await request.send();
+      final responseData = await response.stream.bytesToString();
+      final jsonData = json.decode(responseData);
+      return jsonData['secure_url'];
     } catch (e) {
       return null;
     }
   }
 
-  // Upload chapter page
+  Future<String?> uploadCover(String mangaId, Uint8List imageBytes) async {
+    return await _uploadImage(imageBytes, 'mangabd/covers');
+  }
+
   Future<String?> uploadPage(
     String mangaId,
     String chapterId,
     int pageIndex,
     Uint8List imageBytes,
   ) async {
-    try {
-      final ref = _storage
-          .ref()
-          .child('chapters/$mangaId/$chapterId/page_$pageIndex.jpg');
-      await ref.putData(imageBytes);
-      return await ref.getDownloadURL();
-    } catch (e) {
-      return null;
-    }
+    return await _uploadImage(
+        imageBytes, 'mangabd/chapters/$mangaId/$chapterId');
   }
 
-  // Upload multiple pages
   Future<List<String>> uploadPages(
     String mangaId,
     String chapterId,
@@ -45,14 +54,5 @@ class StorageService {
       if (url != null) urls.add(url);
     }
     return urls;
-  }
-
-  // Delete cover
-  Future<void> deleteCover(String mangaId) async {
-    try {
-      await _storage.ref().child('covers/$mangaId.jpg').delete();
-    } catch (e) {
-      return;
-    }
   }
 }

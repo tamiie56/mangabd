@@ -4,6 +4,7 @@ import '../../utils/auth_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import 'add_manga_screen.dart';
+import 'add_chapter_screen.dart';
 
 class CreatorDashboardScreen extends StatelessWidget {
   const CreatorDashboardScreen({super.key});
@@ -29,10 +30,7 @@ class CreatorDashboardScreen extends StatelessWidget {
         ),
         backgroundColor: Colors.deepPurple,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
-          'New Manga',
-          style: TextStyle(color: Colors.white),
-        ),
+        label: const Text('New Manga', style: TextStyle(color: Colors.white)),
       ),
       body: StreamBuilder<List<MangaModel>>(
         stream: firestoreService.getMangasByCreator(auth.user!.uid),
@@ -118,9 +116,20 @@ class CreatorDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios,
-                          color: Colors.grey, size: 16),
-                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.grey,
+                        size: 16,
+                      ),
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AddChapterScreen(
+                            mangaId: manga.id,
+                            nextChapterNumber: manga.totalChapters + 1,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
