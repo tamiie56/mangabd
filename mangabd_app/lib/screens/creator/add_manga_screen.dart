@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
 import '../../utils/auth_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
+import '../../services/storage/storage_service.dart';
 
 class AddMangaScreen extends StatefulWidget {
   const AddMangaScreen({super.key});
@@ -21,12 +24,22 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
   ];
   final List<String> _selectedGenres = [];
   bool _isLoading = false;
+  Uint8List? _coverImage;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickCover() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      setState(() => _coverImage = bytes);
+    }
   }
 
   Future<void> _submit() async {
@@ -38,13 +51,21 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
     }
     setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
+    final mangaId = DateTime.now().millisecondsSinceEpoch.toString();
+
+    String coverUrl = '';
+    if (_coverImage != null) {
+      coverUrl = await StorageService().uploadCover(mangaId, _coverImage!) ?? '';
+    }
+
     final manga = MangaModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: mangaId,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
       creatorId: auth.user!.uid,
       creatorName: auth.user!.displayName,
       genres: _selectedGenres,
+      coverUrl: coverUrl,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -70,25 +91,37 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Cover placeholder
+            // Cover image picker
             Center(
-              child: Container(
-                width: 120,
-                height: 160,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.deepPurple, width: 2),
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_photo_alternate,
-                        color: Colors.deepPurple, size: 40),
-                    SizedBox(height: 8),
-                    Text('Add Cover',
-                        style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  ],
+              child: GestureDetector(
+                onTap: _pickCover,
+                child: Container(
+                  width: 120,
+                  height: 160,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.deepPurple, width: 2),
+                  ),
+                  child: _coverImage != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.memory(
+                            _coverImage!,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_photo_alternate,
+                                color: Colors.deepPurple, size: 40),
+                            SizedBox(height: 8),
+                            Text('Add Cover',
+                                style: TextStyle(
+                                    color: Colors.grey, fontSize: 12)),
+                          ],
+                        ),
                 ),
               ),
             ),
