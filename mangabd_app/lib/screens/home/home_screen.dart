@@ -5,6 +5,7 @@ import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../creator/creator_dashboard_screen.dart';
 import '../home/manga_detail_screen.dart';
+import '../profile/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -39,7 +40,10 @@ class HomeScreen extends StatelessWidget {
             ),
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
-            onPressed: () {},
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
           ),
         ],
       ),

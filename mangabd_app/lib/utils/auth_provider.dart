@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 import '../services/auth/auth_service.dart';
 
@@ -11,6 +12,25 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _user != null;
   bool get isCreator => _user?.isCreator ?? false;
+
+  AuthProvider() {
+    _init();
+  }
+
+  void _init() {
+    FirebaseAuth.instance.authStateChanges().listen((firebaseUser) async {
+      if (firebaseUser == null) {
+        _user = null;
+        notifyListeners();
+      } else {
+        if (_user == null) {
+          final doc = await _authService.getUserFromFirestore(firebaseUser.uid);
+          _user = doc;
+          notifyListeners();
+        }
+      }
+    });
+  }
 
   void _setLoading(bool value) {
     _isLoading = value;

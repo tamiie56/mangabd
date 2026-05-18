@@ -66,4 +66,15 @@ class AuthService {
   Future<void> signOut() async {
     await _auth.signOut();
   }
+
+  // Get user from Firestore
+  Future<UserModel?> getUserFromFirestore(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) return UserModel.fromMap(doc.data()!);
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }
