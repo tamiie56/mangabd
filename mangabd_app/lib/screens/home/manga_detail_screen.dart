@@ -17,11 +17,13 @@ class MangaDetailScreen extends StatefulWidget {
 class _MangaDetailScreenState extends State<MangaDetailScreen> {
   final _firestoreService = FirestoreService();
   bool _isBookmarked = false;
+  bool _isFollowing = false;
 
   @override
   void initState() {
     super.initState();
     _checkBookmark();
+    _checkFollow();
   }
 
   void _checkBookmark() async {
@@ -32,6 +34,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     if (mounted) setState(() => _isBookmarked = result);
   }
 
+  void _checkFollow() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    if (user.uid == widget.manga.creatorId) return;
+    final result =
+        await _firestoreService.isFollowing(user.uid, widget.manga.creatorId);
+    if (mounted) setState(() => _isFollowing = result);
+  }
+
   void _toggleBookmark() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -39,8 +50,18 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     if (mounted) setState(() => _isBookmarked = !_isBookmarked);
   }
 
+  void _toggleFollow() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    await _firestoreService.toggleFollow(user.uid, widget.manga.creatorId);
+    if (mounted) setState(() => _isFollowing = !_isFollowing);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+    final isOwnManga = user?.uid == widget.manga.creatorId;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       body: CustomScrollView(
@@ -54,7 +75,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               IconButton(
                 icon: Icon(
                   _isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
-                  color: _isBookmarked ? Colors.deepPurpleAccent : Colors.white,
+                  color:
+                      _isBookmarked ? Colors.deepPurpleAccent : Colors.white,
                 ),
                 onPressed: _toggleBookmark,
               ),
@@ -85,11 +107,52 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'by ${widget.manga.creatorName}',
-                    style: const TextStyle(
-                        color: Colors.deepPurpleAccent, fontSize: 14),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'by ${widget.manga.creatorName}',
+                          style: const TextStyle(
+                              color: Colors.deepPurpleAccent, fontSize: 14),
+                        ),
+                      ),
+                      if (!isOwnManga)
+                        StreamBuilder<int>(
+                          stream: _firestoreService
+                              .getFollowerCount(widget.manga.creatorId),
+                          builder: (context, snapshot) {
+                            final count = snapshot.data ?? 0;
+                            return OutlinedButton.icon(
+                              onPressed: _toggleFollow,
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: _isFollowing
+                                      ? Colors.deepPurpleAccent
+                                      : Colors.grey,
+                                ),
+                                foregroundColor: _isFollowing
+                                    ? Colors.deepPurpleAccent
+                                    : Colors.grey,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                              ),
+                              icon: Icon(
+                                _isFollowing
+                                    ? Icons.check
+                                    : Icons.person_add_outlined,
+                                size: 16,
+                              ),
+                              label: Text(
+                                _isFollowing
+                                    ? 'Following ($count)'
+                                    : 'Follow ($count)',
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            );
+                          },
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   Wrap(
@@ -113,7 +176,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   const SizedBox(height: 12),
                   Text(
                     widget.manga.description,
-                    style: const TextStyle(color: Colors.grey, fontSize: 14),
+                    style:
+                        const TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -134,7 +198,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const SliverToBoxAdapter(
                   child: Center(
-                    child: CircularProgressIndicator(color: Colors.deepPurple),
+                    child:
+                        CircularProgressIndicator(color: Colors.deepPurple),
                   ),
                 );
               }

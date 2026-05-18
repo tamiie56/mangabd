@@ -99,7 +99,6 @@ class FirestoreService {
           final mangaSnap = await _firestore
               .collection('mangas')
               .where('creatorId', whereIn: creatorIds)
-              .orderBy('updatedAt', descending: true)
               .get();
           return mangaSnap.docs
               .map((doc) => MangaModel.fromMap(doc.data()))
@@ -144,5 +143,55 @@ class FirestoreService {
         .collection('bookmarks')
         .snapshots()
         .map((snap) => snap.docs.map((d) => d.data()).toList());
+  }
+
+  Future<void> toggleFollow(String currentUserId, String creatorId) async {
+    final followingRef = _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('following')
+        .doc(creatorId);
+    final followerRef = _firestore
+        .collection('users')
+        .doc(creatorId)
+        .collection('followers')
+        .doc(currentUserId);
+
+    final doc = await followingRef.get();
+    final batch = _firestore.batch();
+
+    if (doc.exists) {
+      batch.delete(followingRef);
+      batch.delete(followerRef);
+    } else {
+      batch.set(followingRef, {
+        'creatorId': creatorId,
+        'followedAt': DateTime.now().toIso8601String(),
+      });
+      batch.set(followerRef, {
+        'userId': currentUserId,
+        'followedAt': DateTime.now().toIso8601String(),
+      });
+    }
+    await batch.commit();
+  }
+
+  Future<bool> isFollowing(String currentUserId, String creatorId) async {
+    final doc = await _firestore
+        .collection('users')
+        .doc(currentUserId)
+        .collection('following')
+        .doc(creatorId)
+        .get();
+    return doc.exists;
+  }
+
+  Stream<int> getFollowerCount(String creatorId) {
+    return _firestore
+        .collection('users')
+        .doc(creatorId)
+        .collection('followers')
+        .snapshots()
+        .map((snap) => snap.docs.length);
   }
 }

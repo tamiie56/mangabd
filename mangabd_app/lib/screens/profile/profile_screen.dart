@@ -13,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
-        iconTheme: const IconThemeData(color: Colors.white),
+        automaticallyImplyLeading: false,
         title: const Text(
           'Profile',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -24,7 +24,6 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 24),
-            // Avatar
             CircleAvatar(
               radius: 50,
               backgroundColor: Colors.deepPurple.withOpacity(0.3),
@@ -55,7 +54,8 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
                 color: auth.isCreator
                     ? Colors.deepPurple.withOpacity(0.3)
@@ -65,20 +65,19 @@ class ProfileScreen extends StatelessWidget {
               child: Text(
                 auth.isCreator ? '✦ Creator' : 'Reader',
                 style: TextStyle(
-                  color: auth.isCreator ? Colors.deepPurpleAccent : Colors.grey,
+                  color:
+                      auth.isCreator ? Colors.deepPurpleAccent : Colors.grey,
                   fontSize: 13,
                 ),
               ),
             ),
             const SizedBox(height: 48),
-            // Logout button
             SizedBox(
               width: double.infinity,
               height: 52,
               child: ElevatedButton.icon(
                 onPressed: () async {
                   await auth.signOut();
-                  if (context.mounted) Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red.withOpacity(0.2),
