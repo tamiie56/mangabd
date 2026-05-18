@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../utils/auth_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
+import '../creator/creator_dashboard_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,8 +28,13 @@ class HomeScreen extends StatelessWidget {
         actions: [
           if (auth.isCreator)
             IconButton(
-              icon: const Icon(Icons.add, color: Colors.white),
-              onPressed: () {},
+              icon: const Icon(Icons.dashboard, color: Colors.white),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CreatorDashboardScreen(),
+                ),
+              ),
             ),
           IconButton(
             icon: const Icon(Icons.person, color: Colors.white),
@@ -131,10 +137,7 @@ class _MangaCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     '${manga.totalChapters} chapters',
-                    style: const TextStyle(
-                      color: Colors.grey,
-                      fontSize: 11,
-                    ),
+                    style: const TextStyle(color: Colors.grey, fontSize: 11),
                   ),
                 ],
               ),
