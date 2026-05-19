@@ -44,17 +44,20 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
         automaticallyImplyLeading: false,
         title: TextField(
           controller: _controller,
           onChanged: _onSearch,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black,
+          ),
           decoration: InputDecoration(
-            hintText: 'Manga খুঁজুন...',
+            hintText: 'Search manga...',
             hintStyle: const TextStyle(color: Colors.grey),
             border: InputBorder.none,
             prefixIcon: const Icon(Icons.search, color: Colors.grey),
@@ -71,21 +74,58 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: Colors.deepPurple),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : !_hasSearched
-              ? const Center(
-                  child: Text(
-                    'কিছু লিখে search করুন',
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search,
+                        size: 64,
+                        color: colorScheme.primary.withOpacity(0.4),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Search for manga',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Type a title to get started',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
                   ),
                 )
               : _results.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'কোনো manga পাওয়া যায়নি',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 64,
+                            color: colorScheme.primary.withOpacity(0.4),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'No results found',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Try a different search term',
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
                       ),
                     )
                   : GridView.builder(
@@ -110,15 +150,29 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1A1A1A),
+                              color: isDark
+                                  ? Colors.white.withOpacity(0.05)
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(12),
+                              boxShadow: isDark
+                                  ? []
+                                  : [
+                                      BoxShadow(
+                                        color: Colors.black
+                                            .withOpacity(0.08),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
                             ),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
                                 Expanded(
                                   child: ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
+                                    borderRadius:
+                                        const BorderRadius.vertical(
                                       top: Radius.circular(12),
                                     ),
                                     child: manga.coverUrl.isNotEmpty
@@ -126,13 +180,27 @@ class _SearchScreenState extends State<SearchScreen> {
                                             manga.coverUrl,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (_, __, ___) => Container(
+                                              color: colorScheme.primary
+                                                  .withOpacity(0.2),
+                                              child: Center(
+                                                child: Icon(
+                                                    Icons.menu_book,
+                                                    color: colorScheme
+                                                        .primary,
+                                                    size: 48),
+                                              ),
+                                            ),
                                           )
                                         : Container(
-                                            color: Colors.deepPurple
-                                                .withOpacity(0.3),
-                                            child: const Center(
-                                              child: Icon(Icons.menu_book,
-                                                  color: Colors.deepPurple,
+                                            color: colorScheme.primary
+                                                .withOpacity(0.2),
+                                            child: Center(
+                                              child: Icon(
+                                                  Icons.menu_book,
+                                                  color:
+                                                      colorScheme.primary,
                                                   size: 48),
                                             ),
                                           ),
@@ -147,7 +215,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                       Text(
                                         manga.title,
                                         style: const TextStyle(
-                                          color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                         ),
@@ -158,7 +225,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                       Text(
                                         '${manga.totalChapters} chapters',
                                         style: const TextStyle(
-                                            color: Colors.grey, fontSize: 11),
+                                            color: Colors.grey,
+                                            fontSize: 11),
                                       ),
                                     ],
                                   ),

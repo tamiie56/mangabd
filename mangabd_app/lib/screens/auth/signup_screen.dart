@@ -25,11 +25,22 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _signup() async {
+    final name = _displayNameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields.')),
+      );
+      return;
+    }
+
     final auth = context.read<AuthProvider>();
     final success = await auth.signUp(
-      email: _emailController.text.trim(),
-      password: _passwordController.text.trim(),
-      displayName: _displayNameController.text.trim(),
+      email: email,
+      password: password,
+      displayName: name,
       isCreator: _isCreator,
     );
     if (!success && mounted) {
@@ -42,11 +53,13 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
       ),
       body: SafeArea(
         child: Center(
@@ -55,12 +68,12 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Create Account',
                   style: TextStyle(
-                    color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -68,58 +81,63 @@ class _SignupScreenState extends State<SignupScreen> {
                   'Join MangaBD today',
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 40),
                 TextField(
                   controller: _displayNameController,
-                  style: const TextStyle(color: Colors.white),
+                  textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
                     hintText: 'Display Name',
-                    hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
+                    fillColor: isDark
+                        ? Colors.white.withOpacity(0.07)
+                        : Colors.black.withOpacity(0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: const Icon(Icons.person, color: Colors.grey),
+                    prefixIcon:
+                        const Icon(Icons.person_outline, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _emailController,
-                  style: const TextStyle(color: Colors.white),
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: 'Email',
-                    hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
+                    fillColor: isDark
+                        ? Colors.white.withOpacity(0.07)
+                        : Colors.black.withOpacity(0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: const Icon(Icons.email, color: Colors.grey),
+                    prefixIcon:
+                        const Icon(Icons.email_outlined, color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
+                    fillColor: isDark
+                        ? Colors.white.withOpacity(0.07)
+                        : Colors.black.withOpacity(0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon: const Icon(Icons.lock, color: Colors.grey),
+                    prefixIcon:
+                        const Icon(Icons.lock_outline, color: Colors.grey),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
                         color: Colors.grey,
                       ),
                       onPressed: () => setState(
@@ -130,23 +148,39 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 16),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
+                      horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: isDark
+                        ? Colors.white.withOpacity(0.07)
+                        : Colors.black.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Register as Creator',
-                        style: TextStyle(color: Colors.white),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Register as Creator',
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          Text(
+                            'Upload and manage manga',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: isDark
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600],
+                            ),
+                          ),
+                        ],
                       ),
                       Switch(
                         value: _isCreator,
                         onChanged: (val) =>
                             setState(() => _isCreator = val),
-                        activeColor: Colors.deepPurple,
+                        activeColor: colorScheme.primary,
                       ),
                     ],
                   ),
@@ -158,18 +192,24 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: ElevatedButton(
                     onPressed: auth.isLoading ? null : _signup,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: colorScheme.primary,
+                      foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: auth.isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white)
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : const Text(
                             'Sign Up',
                             style: TextStyle(
-                              color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -179,9 +219,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
+                  child: Text(
                     'Already have an account? Login',
-                    style: TextStyle(color: Colors.deepPurpleAccent),
+                    style: TextStyle(color: colorScheme.primary),
                   ),
                 ),
               ],

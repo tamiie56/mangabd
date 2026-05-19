@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../models/manga_model.dart';
 import '../../models/chapter_model.dart';
 import '../../services/firestore/firestore_service.dart';
+import '../../utils/auth_provider.dart';
 
 class ReaderScreen extends StatefulWidget {
   final MangaModel manga;
@@ -19,6 +21,23 @@ class ReaderScreen extends StatefulWidget {
 
 class _ReaderScreenState extends State<ReaderScreen> {
   bool _showControls = true;
+  bool _tracked = false;
+  final FirestoreService _firestoreService = FirestoreService();
+
+  @override
+  void initState() {
+    super.initState();
+    _trackRead();
+  }
+
+  Future<void> _trackRead() async {
+    if (_tracked) return;
+    _tracked = true;
+    final auth = context.read<AuthProvider>();
+    if (auth.user != null) {
+      await _firestoreService.incrementChaptersRead(auth.user!.uid);
+    }
+  }
 
   void _toggleControls() {
     setState(() => _showControls = !_showControls);
@@ -32,7 +51,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
         onTap: _toggleControls,
         child: Stack(
           children: [
-            // Pages
             widget.chapter.pageUrls.isEmpty
                 ? const Center(
                     child: Text(
@@ -54,7 +72,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                             child: Center(
                               child: CircularProgressIndicator(
                                 color: Colors.deepPurple,
-                                value: loadingProgress.expectedTotalBytes != null
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
                                     ? loadingProgress.cumulativeBytesLoaded /
                                         loadingProgress.expectedTotalBytes!
                                     : null,
@@ -65,8 +84,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       );
                     },
                   ),
-
-            // Top controls
             if (_showControls)
               Positioned(
                 top: 0,
@@ -89,7 +106,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        icon: const Icon(Icons.arrow_back,
+                            color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
                       Expanded(

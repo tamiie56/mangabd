@@ -10,9 +10,11 @@ class BookmarksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (user == null) {
       return const Scaffold(
-        backgroundColor: Color(0xFF0D0D0D),
         body: Center(
           child: Text('Please login', style: TextStyle(color: Colors.grey)),
         ),
@@ -20,35 +22,49 @@ class BookmarksScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
         automaticallyImplyLeading: false,
         title: const Text(
           'Bookmarks',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: FirestoreService().getBookmarks(user.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.deepPurple),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
           final bookmarks = snapshot.data ?? [];
           if (bookmarks.isEmpty) {
-            return const Center(
-              child: Text(
-                'No bookmarks yet.',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.bookmark_outline,
+                    size: 64,
+                    color: colorScheme.primary.withOpacity(0.4),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No bookmarks yet.',
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Bookmark manga to read them later.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
               ),
             );
           }
           return GridView.builder(
             padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.65,
               crossAxisSpacing: 12,
@@ -58,10 +74,10 @@ class BookmarksScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final b = bookmarks[index];
               final manga = MangaModel(
-                id: b['mangaId'],
-                title: b['title'],
+                id: b['mangaId'] ?? '',
+                title: b['title'] ?? '',
                 description: '',
-                coverUrl: b['coverUrl'],
+                coverUrl: b['coverUrl'] ?? '',
                 creatorId: '',
                 creatorName: '',
                 totalChapters: b['totalChapters'] ?? 0,
@@ -77,8 +93,19 @@ class BookmarksScreen extends StatelessWidget {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: isDark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(12),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,17 +115,28 @@ class BookmarksScreen extends StatelessWidget {
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(12),
                           ),
-                          child: b['coverUrl'].toString().isNotEmpty
+                          child: (b['coverUrl'] ?? '').toString().isNotEmpty
                               ? Image.network(
                                   b['coverUrl'],
                                   width: double.infinity,
                                   fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: colorScheme.primary
+                                        .withOpacity(0.2),
+                                    child: Center(
+                                      child: Icon(Icons.menu_book,
+                                          color: colorScheme.primary,
+                                          size: 48),
+                                    ),
+                                  ),
                                 )
                               : Container(
-                                  color: Colors.deepPurple.withOpacity(0.3),
-                                  child: const Center(
+                                  color: colorScheme.primary
+                                      .withOpacity(0.2),
+                                  child: Center(
                                     child: Icon(Icons.menu_book,
-                                        color: Colors.deepPurple, size: 48),
+                                        color: colorScheme.primary,
+                                        size: 48),
                                   ),
                                 ),
                         ),
@@ -109,9 +147,8 @@ class BookmarksScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              b['title'],
+                              b['title'] ?? '',
                               style: const TextStyle(
-                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                               ),

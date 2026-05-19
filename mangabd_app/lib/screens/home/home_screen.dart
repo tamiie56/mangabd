@@ -14,15 +14,15 @@ class HomeScreen extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     final themeProvider = context.watch<ThemeProvider>();
     final isDark = themeProvider.isDark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
+          title: const Text(
             'MangaBD',
             style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
             ),
@@ -32,16 +32,17 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.only(right: 12),
               child: IconButton(
                 icon: Icon(
-                  isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                  color: isDark ? Colors.white : Colors.black,
+                  isDark
+                      ? Icons.light_mode_outlined
+                      : Icons.dark_mode_outlined,
                 ),
                 onPressed: () => themeProvider.toggleTheme(),
               ),
             ),
           ],
           bottom: TabBar(
-            indicatorColor: Colors.deepPurpleAccent,
-            labelColor: Colors.deepPurpleAccent,
+            indicatorColor: colorScheme.primary,
+            labelColor: colorScheme.primary,
             unselectedLabelColor: Colors.grey,
             tabs: const [
               Tab(text: 'For You'),
@@ -71,16 +72,33 @@ class _ForYouTab extends StatelessWidget {
       stream: _firestoreService.getMangas(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.deepPurple),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(
-            child: Text(
-              'No manga yet.\nBe the first to upload!',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 16),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.menu_book_outlined,
+                  size: 64,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(0.4),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'No manga yet.',
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Be the first to upload!',
+                  style: TextStyle(color: Colors.grey),
+                ),
+              ],
             ),
           );
         }
@@ -108,16 +126,34 @@ class _FollowingTab extends StatelessWidget {
       stream: _firestoreService.getFollowingMangas(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: Colors.deepPurple),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(
-            child: Text(
-              'Follow some creators to see their manga here.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 16),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.people_outline,
+                  size: 64,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(0.4),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'No updates yet.',
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Follow creators to see their manga here.',
+                  style: TextStyle(color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           );
         }
@@ -155,16 +191,18 @@ class _MangaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = context.watch<ThemeProvider>().isDark;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => MangaDetailScreen(manga: manga)),
+        MaterialPageRoute(
+            builder: (_) => MangaDetailScreen(manga: manga)),
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: isDark
               ? []
@@ -189,12 +227,19 @@ class _MangaCard extends StatelessWidget {
                         manga.coverUrl,
                         width: double.infinity,
                         fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          child: Center(
+                            child: Icon(Icons.menu_book,
+                                color: colorScheme.primary, size: 48),
+                          ),
+                        ),
                       )
                     : Container(
-                        color: Colors.deepPurple.withOpacity(0.3),
-                        child: const Center(
+                        color: colorScheme.primary.withOpacity(0.2),
+                        child: Center(
                           child: Icon(Icons.menu_book,
-                              color: Colors.deepPurple, size: 48),
+                              color: colorScheme.primary, size: 48),
                         ),
                       ),
               ),
@@ -206,8 +251,7 @@ class _MangaCard extends StatelessWidget {
                 children: [
                   Text(
                     manga.title,
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black,
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -217,7 +261,8 @@ class _MangaCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     '${manga.totalChapters} chapters',
-                    style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    style: const TextStyle(
+                        color: Colors.grey, fontSize: 11),
                   ),
                 ],
               ),

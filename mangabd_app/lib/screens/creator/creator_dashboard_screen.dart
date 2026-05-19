@@ -16,12 +16,10 @@ class CreatorDashboardScreen extends StatelessWidget {
     final firestoreService = FirestoreService();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
           'My Works',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -29,24 +27,40 @@ class CreatorDashboardScreen extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (_) => const AddMangaScreen()),
         ),
-        backgroundColor: Colors.deepPurple,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('New Manga', style: TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.add),
+        label: const Text('New Manga'),
       ),
       body: StreamBuilder<List<MangaModel>>(
         stream: firestoreService.getMangasByCreator(auth.user!.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.deepPurple),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                'No manga yet.\nTap + to create your first manga!',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.collections_bookmark_outlined,
+                    size: 64,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withOpacity(0.4),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No manga yet.',
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Tap + to create your first manga!',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
               ),
             );
           }
@@ -56,12 +70,21 @@ class CreatorDashboardScreen extends StatelessWidget {
             itemCount: mangas.length,
             itemBuilder: (context, index) {
               final manga = mangas[index];
+              final isDark =
+                  Theme.of(context).brightness == Brightness.dark;
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A),
-                  borderRadius: BorderRadius.circular(12),
+                  color: isDark
+                      ? Colors.white.withOpacity(0.05)
+                      : Colors.black.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.08)
+                        : Colors.black.withOpacity(0.08),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -77,10 +100,15 @@ class CreatorDashboardScreen extends StatelessWidget {
                           : Container(
                               width: 60,
                               height: 80,
-                              color: Colors.deepPurple.withOpacity(0.3),
-                              child: const Icon(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.2),
+                              child: Icon(
                                 Icons.menu_book,
-                                color: Colors.deepPurple,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary,
                               ),
                             ),
                     ),
@@ -92,7 +120,6 @@ class CreatorDashboardScreen extends StatelessWidget {
                           Text(
                             manga.title,
                             style: const TextStyle(
-                              color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
@@ -101,18 +128,19 @@ class CreatorDashboardScreen extends StatelessWidget {
                           Text(
                             '${manga.totalChapters} chapters',
                             style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 13,
-                            ),
+                                color: Colors.grey, fontSize: 13),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            manga.genres.join(', '),
-                            style: const TextStyle(
-                              color: Colors.deepPurpleAccent,
-                              fontSize: 12,
+                          if (manga.genres.isNotEmpty)
+                            Text(
+                              manga.genres.join(', '),
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -133,47 +161,44 @@ class CreatorDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: Colors.grey),
-                      color: const Color(0xFF2A2A2A),
+                      icon: const Icon(Icons.more_vert,
+                          color: Colors.grey),
                       onSelected: (value) async {
                         if (value == 'edit') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => EditMangaScreen(manga: manga),
+                              builder: (_) =>
+                                  EditMangaScreen(manga: manga),
                             ),
                           );
                         } else if (value == 'delete') {
                           final confirm = await showDialog<bool>(
                             context: context,
                             builder: (_) => AlertDialog(
-                              backgroundColor: const Color(0xFF1A1A1A),
-                              title: const Text(
-                                'Delete Manga',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              title: const Text('Delete Manga'),
                               content: Text(
                                 '"${manga.title}" permanently delete হবে।',
-                                style: const TextStyle(color: Colors.grey),
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.pop(context, false),
-                                  child: const Text('Cancel',
-                                      style: TextStyle(color: Colors.grey)),
+                                  child: const Text('Cancel'),
                                 ),
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.pop(context, true),
                                   child: const Text('Delete',
-                                      style: TextStyle(color: Colors.red)),
+                                      style:
+                                          TextStyle(color: Colors.red)),
                                 ),
                               ],
                             ),
                           );
                           if (confirm == true) {
-                            await firestoreService.deleteManga(manga.id);
+                            await firestoreService.deleteManga(
+                                manga.id, auth.user!.uid);
                           }
                         }
                       },
@@ -182,10 +207,9 @@ class CreatorDashboardScreen extends StatelessWidget {
                           value: 'edit',
                           child: Row(
                             children: [
-                              Icon(Icons.edit, color: Colors.white, size: 18),
+                              Icon(Icons.edit, size: 18),
                               SizedBox(width: 8),
-                              Text('Edit',
-                                  style: TextStyle(color: Colors.white)),
+                              Text('Edit'),
                             ],
                           ),
                         ),
@@ -193,7 +217,8 @@ class CreatorDashboardScreen extends StatelessWidget {
                           value: 'delete',
                           child: Row(
                             children: [
-                              Icon(Icons.delete, color: Colors.red, size: 18),
+                              Icon(Icons.delete,
+                                  color: Colors.red, size: 18),
                               SizedBox(width: 8),
                               Text('Delete',
                                   style: TextStyle(color: Colors.red)),

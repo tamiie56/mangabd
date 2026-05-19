@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
+import 'dart:io';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../../services/storage/storage_service.dart';
@@ -19,11 +19,11 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
   final List<String> _allGenres = [
     'Action', 'Adventure', 'Comedy', 'Drama',
     'Fantasy', 'Horror', 'Romance', 'Sci-Fi',
-    'Slice of Life', 'Thriller'
+    'Slice of Life', 'Thriller',
   ];
   late List<String> _selectedGenres;
   bool _isLoading = false;
-  Uint8List? _newCoverImage;
+  File? _newCoverFile;
 
   @override
   void initState() {
@@ -43,10 +43,13 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
 
   Future<void> _pickCover() async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxWidth: 600,
+    );
     if (image != null) {
-      final bytes = await image.readAsBytes();
-      setState(() => _newCoverImage = bytes);
+      setState(() => _newCoverFile = File(image.path));
     }
   }
 
@@ -60,9 +63,9 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
     setState(() => _isLoading = true);
 
     String coverUrl = widget.manga.coverUrl;
-    if (_newCoverImage != null) {
+    if (_newCoverFile != null) {
       coverUrl =
-          await StorageService().uploadCover(widget.manga.id, _newCoverImage!) ??
+          await StorageService().uploadCoverImage(widget.manga.id, _newCoverFile!) ??
               coverUrl;
     }
 
@@ -74,20 +77,22 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
       'updatedAt': DateTime.now().toIso8601String(),
     });
 
-    setState(() => _isLoading = false);
-    if (mounted) Navigator.pop(context);
+    if (mounted) {
+      setState(() => _isLoading = false);
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'Edit Manga',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -102,28 +107,36 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
                   width: 120,
                   height: 160,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.deepPurple, width: 2),
+                    border: Border.all(
+                        color: colorScheme.primary, width: 2),
                   ),
-                  child: _newCoverImage != null
+                  child: _newCoverFile != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.memory(_newCoverImage!, fit: BoxFit.cover),
+                          child: Image.file(
+                            _newCoverFile!,
+                            fit: BoxFit.cover,
+                          ),
                         )
                       : widget.manga.coverUrl.isNotEmpty
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(widget.manga.coverUrl,
-                                  fit: BoxFit.cover),
+                              child: Image.network(
+                                widget.manga.coverUrl,
+                                fit: BoxFit.cover,
+                              ),
                             )
-                          : const Column(
+                          : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.add_photo_alternate,
-                                    color: Colors.deepPurple, size: 40),
-                                SizedBox(height: 8),
-                                Text('Change Cover',
+                                    color: colorScheme.primary, size: 40),
+                                const SizedBox(height: 8),
+                                const Text('Change Cover',
                                     style: TextStyle(
                                         color: Colors.grey, fontSize: 12)),
                               ],
@@ -133,17 +146,16 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
             ),
             const SizedBox(height: 24),
             const Text('Title',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextField(
               controller: _titleController,
-              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Enter manga title',
-                hintStyle: const TextStyle(color: Colors.grey),
                 filled: true,
-                fillColor: const Color(0xFF1A1A1A),
+                fillColor: isDark
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : Colors.black.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -152,18 +164,17 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
             ),
             const SizedBox(height: 16),
             const Text('Description',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              style: const TextStyle(color: Colors.white),
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Enter manga description',
-                hintStyle: const TextStyle(color: Colors.grey),
                 filled: true,
-                fillColor: const Color(0xFF1A1A1A),
+                fillColor: isDark
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : Colors.black.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -172,8 +183,7 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
             ),
             const SizedBox(height: 16),
             const Text('Genres',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -191,13 +201,13 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
                         horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: selected
-                          ? Colors.deepPurple
-                          : const Color(0xFF1A1A1A),
+                          ? colorScheme.primary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: selected
-                            ? Colors.deepPurple
-                            : Colors.grey.withOpacity(0.3),
+                            ? colorScheme.primary
+                            : Colors.grey.withValues(alpha: 0.4),
                       ),
                     ),
                     child: Text(
@@ -218,23 +228,31 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text(
                         'Save Changes',
                         style: TextStyle(
-                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
               ),
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),

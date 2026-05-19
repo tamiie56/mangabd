@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
+import 'dart:io';
 import '../../utils/auth_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
@@ -20,11 +20,11 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
   final List<String> _allGenres = [
     'Action', 'Adventure', 'Comedy', 'Drama',
     'Fantasy', 'Horror', 'Romance', 'Sci-Fi',
-    'Slice of Life', 'Thriller'
+    'Slice of Life', 'Thriller',
   ];
   final List<String> _selectedGenres = [];
   bool _isLoading = false;
-  Uint8List? _coverImage;
+  File? _coverFile;
 
   @override
   void dispose() {
@@ -35,10 +35,13 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
 
   Future<void> _pickCover() async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxWidth: 600,
+    );
     if (image != null) {
-      final bytes = await image.readAsBytes();
-      setState(() => _coverImage = bytes);
+      setState(() => _coverFile = File(image.path));
     }
   }
 
@@ -54,8 +57,9 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
     final mangaId = DateTime.now().millisecondsSinceEpoch.toString();
 
     String coverUrl = '';
-    if (_coverImage != null) {
-      coverUrl = await StorageService().uploadCover(mangaId, _coverImage!) ?? '';
+    if (_coverFile != null) {
+      coverUrl =
+          await StorageService().uploadCoverImage(mangaId, _coverFile!) ?? '';
     }
 
     final manga = MangaModel(
@@ -70,20 +74,22 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
       updatedAt: DateTime.now(),
     );
     await FirestoreService().addManga(manga);
-    setState(() => _isLoading = false);
-    if (mounted) Navigator.pop(context);
+    if (mounted) {
+      setState(() => _isLoading = false);
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'New Manga',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: SingleChildScrollView(
@@ -91,7 +97,6 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Cover image picker
             Center(
               child: GestureDetector(
                 onTap: _pickCover,
@@ -99,25 +104,28 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
                   width: 120,
                   height: 160,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: isDark
+                        ? Colors.white.withOpacity(0.07)
+                        : Colors.black.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.deepPurple, width: 2),
+                    border: Border.all(
+                        color: colorScheme.primary, width: 2),
                   ),
-                  child: _coverImage != null
+                  child: _coverFile != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.memory(
-                            _coverImage!,
+                          child: Image.file(
+                            _coverFile!,
                             fit: BoxFit.cover,
                           ),
                         )
-                      : const Column(
+                      : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.add_photo_alternate,
-                                color: Colors.deepPurple, size: 40),
-                            SizedBox(height: 8),
-                            Text('Add Cover',
+                                color: colorScheme.primary, size: 40),
+                            const SizedBox(height: 8),
+                            const Text('Add Cover',
                                 style: TextStyle(
                                     color: Colors.grey, fontSize: 12)),
                           ],
@@ -126,19 +134,17 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Title
             const Text('Title',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextField(
               controller: _titleController,
-              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Enter manga title',
-                hintStyle: const TextStyle(color: Colors.grey),
                 filled: true,
-                fillColor: const Color(0xFF1A1A1A),
+                fillColor: isDark
+                    ? Colors.white.withOpacity(0.07)
+                    : Colors.black.withOpacity(0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -146,20 +152,18 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Description
             const Text('Description',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              style: const TextStyle(color: Colors.white),
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Enter manga description',
-                hintStyle: const TextStyle(color: Colors.grey),
                 filled: true,
-                fillColor: const Color(0xFF1A1A1A),
+                fillColor: isDark
+                    ? Colors.white.withOpacity(0.07)
+                    : Colors.black.withOpacity(0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -167,10 +171,8 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Genres
             const Text('Genres',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -188,19 +190,21 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
                         horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: selected
-                          ? Colors.deepPurple
-                          : const Color(0xFF1A1A1A),
+                          ? colorScheme.primary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: selected
-                            ? Colors.deepPurple
-                            : Colors.grey.withOpacity(0.3),
+                            ? colorScheme.primary
+                            : Colors.grey.withOpacity(0.4),
                       ),
                     ),
                     child: Text(
                       genre,
                       style: TextStyle(
-                        color: selected ? Colors.white : Colors.grey,
+                        color: selected
+                            ? Colors.white
+                            : Colors.grey,
                         fontSize: 13,
                       ),
                     ),
@@ -215,23 +219,31 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _submit,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: colorScheme.primary,
+                  foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text(
                         'Create Manga',
                         style: TextStyle(
-                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
               ),
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),

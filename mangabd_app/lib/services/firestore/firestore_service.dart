@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/manga_model.dart';
 import '../../models/chapter_model.dart';
+import '../../models/user_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -31,10 +32,28 @@ class FirestoreService {
 
   Future<void> addManga(MangaModel manga) async {
     await _firestore.collection('mangas').doc(manga.id).set(manga.toMap());
+    await _firestore.collection('users').doc(manga.creatorId).update({
+      'totalWorks': FieldValue.increment(1),
+    });
   }
 
-  Future<void> deleteManga(String mangaId) async {
-    await _firestore.collection('mangas').doc(mangaId).delete();
+  Future<void> deleteManga(String mangaId, String creatorId) async {
+    final chaptersSnap = await _firestore
+        .collection('mangas')
+        .doc(mangaId)
+        .collection('chapters')
+        .get();
+    final batch = _firestore.batch();
+    for (final doc in chaptersSnap.docs) {
+      batch.delete(doc.reference);
+    }
+    batch.delete(_firestore.collection('mangas').doc(mangaId));
+    await batch.commit();
+    await _firestore.collection('users').doc(creatorId).update({
+      'totalWorks': FieldValue.increment(-1),
+      'totalChaptersUploaded':
+          FieldValue.increment(-chaptersSnap.docs.length),
+    });
   }
 
   Stream<List<ChapterModel>> getChapters(String mangaId) {
@@ -61,10 +80,28 @@ class FirestoreService {
 
     await _firestore.collection('mangas').doc(chapter.mangaId).update({
       'totalChapters': FieldValue.increment(1),
+      'updatedAt': DateTime.now().toIso8601String(),
     });
+
+    final mangaDoc = await _firestore
+        .collection('mangas')
+        .doc(chapter.mangaId)
+        .get();
+    if (mangaDoc.exists) {
+      final creatorId = mangaDoc.data()?['creatorId'] as String?;
+      if (creatorId != null) {
+        await _firestore.collection('users').doc(creatorId).update({
+          'totalChaptersUploaded': FieldValue.increment(1),
+        });
+      }
+    }
   }
 
   Future<void> deleteChapter(String mangaId, String chapterId) async {
+    final mangaDoc =
+        await _firestore.collection('mangas').doc(mangaId).get();
+    final creatorId = mangaDoc.data()?['creatorId'] as String?;
+
     await _firestore
         .collection('mangas')
         .doc(mangaId)
@@ -75,6 +112,12 @@ class FirestoreService {
     await _firestore.collection('mangas').doc(mangaId).update({
       'totalChapters': FieldValue.increment(-1),
     });
+
+    if (creatorId != null) {
+      await _firestore.collection('users').doc(creatorId).update({
+        'totalChaptersUploaded': FieldValue.increment(-1),
+      });
+    }
   }
 
   Future<List<MangaModel>> searchManga(String query) async {
@@ -115,6 +158,9 @@ class FirestoreService {
     final doc = await ref.get();
     if (doc.exists) {
       await ref.delete();
+      await _firestore.collection('users').doc(userId).update({
+        'bookmarksCount': FieldValue.increment(-1),
+      });
     } else {
       await ref.set({
         'mangaId': manga.id,
@@ -122,6 +168,9 @@ class FirestoreService {
         'coverUrl': manga.coverUrl,
         'totalChapters': manga.totalChapters,
         'addedAt': DateTime.now().toIso8601String(),
+      });
+      await _firestore.collection('users').doc(userId).update({
+        'bookmarksCount': FieldValue.increment(1),
       });
     }
   }
@@ -145,7 +194,8 @@ class FirestoreService {
         .map((snap) => snap.docs.map((d) => d.data()).toList());
   }
 
-  Future<void> toggleFollow(String currentUserId, String creatorId) async {
+  Future<void> toggleFollow(
+      String currentUserId, String creatorId) async {
     final followingRef = _firestore
         .collection('users')
         .doc(currentUserId)
@@ -163,6 +213,13 @@ class FirestoreService {
     if (doc.exists) {
       batch.delete(followingRef);
       batch.delete(followerRef);
+      await batch.commit();
+      await _firestore.collection('users').doc(currentUserId).update({
+        'followingCount': FieldValue.increment(-1),
+      });
+      await _firestore.collection('users').doc(creatorId).update({
+        'followersCount': FieldValue.increment(-1),
+      });
     } else {
       batch.set(followingRef, {
         'creatorId': creatorId,
@@ -172,11 +229,18 @@ class FirestoreService {
         'userId': currentUserId,
         'followedAt': DateTime.now().toIso8601String(),
       });
+      await batch.commit();
+      await _firestore.collection('users').doc(currentUserId).update({
+        'followingCount': FieldValue.increment(1),
+      });
+      await _firestore.collection('users').doc(creatorId).update({
+        'followersCount': FieldValue.increment(1),
+      });
     }
-    await batch.commit();
   }
 
-  Future<bool> isFollowing(String currentUserId, String creatorId) async {
+  Future<bool> isFollowing(
+      String currentUserId, String creatorId) async {
     final doc = await _firestore
         .collection('users')
         .doc(currentUserId)
@@ -195,7 +259,39 @@ class FirestoreService {
         .map((snap) => snap.docs.length);
   }
 
-  Future<void> updateManga(String mangaId, Map<String, dynamic> data) async {
+  Future<void> updateManga(
+      String mangaId, Map<String, dynamic> data) async {
     await _firestore.collection('mangas').doc(mangaId).update(data);
+  }
+
+  Future<void> incrementChaptersRead(String userId) async {
+    await _firestore.collection('users').doc(userId).update({
+      'chaptersRead': FieldValue.increment(1),
+    });
+  }
+
+  Future<UserModel?> getUserById(String uid) async {
+    try {
+      final doc =
+          await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) return UserModel.fromMap(doc.data()!);
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> updateUserProfile(
+      String uid, Map<String, dynamic> data) async {
+    await _firestore.collection('users').doc(uid).update(data);
+  }
+
+  Stream<UserModel> getUserStream(String uid) {
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .where((doc) => doc.exists)
+        .map((doc) => UserModel.fromMap(doc.data()!));
   }
 }

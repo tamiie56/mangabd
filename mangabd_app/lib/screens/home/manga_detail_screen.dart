@@ -38,8 +38,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
     if (user.uid == widget.manga.creatorId) return;
-    final result =
-        await _firestoreService.isFollowing(user.uid, widget.manga.creatorId);
+    final result = await _firestoreService.isFollowing(
+        user.uid, widget.manga.creatorId);
     if (mounted) setState(() => _isFollowing = result);
   }
 
@@ -53,7 +53,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   void _toggleFollow() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
-    await _firestoreService.toggleFollow(user.uid, widget.manga.creatorId);
+    await _firestoreService.toggleFollow(
+        user.uid, widget.manga.creatorId);
     if (mounted) setState(() => _isFollowing = !_isFollowing);
   }
 
@@ -61,34 +62,35 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final isOwnManga = user?.uid == widget.manga.creatorId;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             expandedHeight: 300,
             pinned: true,
-            backgroundColor: const Color(0xFF1A1A1A),
-            iconTheme: const IconThemeData(color: Colors.white),
             actions: [
               IconButton(
                 icon: Icon(
                   _isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
-                  color:
-                      _isBookmarked ? Colors.deepPurpleAccent : Colors.white,
+                  color: _isBookmarked
+                      ? colorScheme.primary
+                      : Colors.white,
                 ),
                 onPressed: _toggleBookmark,
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: widget.manga.coverUrl.isNotEmpty
-                  ? Image.network(widget.manga.coverUrl, fit: BoxFit.cover)
+                  ? Image.network(widget.manga.coverUrl,
+                      fit: BoxFit.cover)
                   : Container(
-                      color: Colors.deepPurple.withOpacity(0.3),
-                      child: const Center(
+                      color: colorScheme.primary.withOpacity(0.3),
+                      child: Center(
                         child: Icon(Icons.menu_book,
-                            color: Colors.deepPurple, size: 80),
+                            color: colorScheme.primary, size: 80),
                       ),
                     ),
             ),
@@ -102,7 +104,6 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   Text(
                     widget.manga.title,
                     style: const TextStyle(
-                      color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -113,8 +114,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       Expanded(
                         child: Text(
                           'by ${widget.manga.creatorName}',
-                          style: const TextStyle(
-                              color: Colors.deepPurpleAccent, fontSize: 14),
+                          style: TextStyle(
+                              color: colorScheme.primary, fontSize: 14),
                         ),
                       ),
                       if (!isOwnManga)
@@ -128,11 +129,11 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(
                                   color: _isFollowing
-                                      ? Colors.deepPurpleAccent
+                                      ? colorScheme.primary
                                       : Colors.grey,
                                 ),
                                 foregroundColor: _isFollowing
-                                    ? Colors.deepPurpleAccent
+                                    ? colorScheme.primary
                                     : Colors.grey,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),
@@ -157,18 +158,19 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   const SizedBox(height: 12),
                   Wrap(
                     spacing: 8,
+                    runSpacing: 6,
                     children: widget.manga.genres.map((genre) {
                       return Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.withOpacity(0.3),
+                          color: colorScheme.primary.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           genre,
-                          style: const TextStyle(
-                              color: Colors.deepPurpleAccent, fontSize: 12),
+                          style: TextStyle(
+                              color: colorScheme.primary, fontSize: 12),
                         ),
                       );
                     }).toList(),
@@ -176,14 +178,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   const SizedBox(height: 12),
                   Text(
                     widget.manga.description,
-                    style:
-                        const TextStyle(color: Colors.grey, fontSize: 14),
+                    style: TextStyle(
+                      color: isDark ? Colors.grey[400] : Colors.grey[700],
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 24),
                   const Text(
                     'Chapters',
                     style: TextStyle(
-                      color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -197,10 +200,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const SliverToBoxAdapter(
-                  child: Center(
-                    child:
-                        CircularProgressIndicator(color: Colors.deepPurple),
-                  ),
+                  child: Center(child: CircularProgressIndicator()),
                 );
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -233,14 +233,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple.withOpacity(0.3),
+                          color:
+                              colorScheme.primary.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
                           child: Text(
                             '${chapter.chapterNumber}',
-                            style: const TextStyle(
-                              color: Colors.deepPurpleAccent,
+                            style: TextStyle(
+                              color: colorScheme.primary,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -248,14 +249,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       ),
                       title: Text(
                         'Chapter ${chapter.chapterNumber}: ${chapter.title}',
-                        style: const TextStyle(color: Colors.white),
                       ),
                       subtitle: Text(
                         '${chapter.pageUrls.length} pages',
                         style: const TextStyle(color: Colors.grey),
                       ),
-                      trailing: const Icon(Icons.play_arrow,
-                          color: Colors.deepPurpleAccent),
+                      trailing: Icon(Icons.play_arrow,
+                          color: colorScheme.primary),
                     );
                   },
                   childCount: chapters.length,

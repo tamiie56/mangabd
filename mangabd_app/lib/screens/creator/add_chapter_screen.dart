@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
+import 'dart:io';
 import '../../models/chapter_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../../services/storage/storage_service.dart';
@@ -21,7 +21,7 @@ class AddChapterScreen extends StatefulWidget {
 
 class _AddChapterScreenState extends State<AddChapterScreen> {
   final _titleController = TextEditingController();
-  final List<Uint8List> _pages = [];
+  final List<File> _pages = [];
   bool _isLoading = false;
 
   @override
@@ -32,10 +32,9 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
 
   Future<void> _pickPages() async {
     final picker = ImagePicker();
-    final images = await picker.pickMultiImage();
+    final images = await picker.pickMultiImage(imageQuality: 80);
     for (final image in images) {
-      final bytes = await image.readAsBytes();
-      setState(() => _pages.add(bytes));
+      setState(() => _pages.add(File(image.path)));
     }
   }
 
@@ -61,14 +60,17 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
     final chapterId = DateTime.now().millisecondsSinceEpoch.toString();
     final storageService = StorageService();
 
-    // Upload pages
-    final pageUrls = await storageService.uploadPages(
-      widget.mangaId,
-      chapterId,
-      _pages,
-    );
+    final List<String> pageUrls = [];
+    for (int i = 0; i < _pages.length; i++) {
+      final url = await storageService.uploadChapterPage(
+        widget.mangaId,
+        chapterId,
+        'page_$i',
+        _pages[i],
+      );
+      if (url != null) pageUrls.add(url);
+    }
 
-    // Save chapter to Firestore
     final chapter = ChapterModel(
       id: chapterId,
       mangaId: widget.mangaId,
@@ -80,21 +82,22 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
 
     await FirestoreService().addChapter(chapter);
 
-    setState(() => _isLoading = false);
-    if (mounted) Navigator.pop(context);
+    if (mounted) {
+      setState(() => _isLoading = false);
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A1A),
-        iconTheme: const IconThemeData(color: Colors.white),
         title: Text(
           'Chapter ${widget.nextChapterNumber}',
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: _isLoading
@@ -102,7 +105,7 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(color: Colors.deepPurple),
+                  CircularProgressIndicator(),
                   SizedBox(height: 16),
                   Text(
                     'Uploading pages...',
@@ -118,18 +121,17 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                 children: [
                   const Text(
                     'Chapter Title',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _titleController,
-                    style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'e.g. The Beginning',
-                      hintStyle: const TextStyle(color: Colors.grey),
                       filled: true,
-                      fillColor: const Color(0xFF1A1A1A),
+                      fillColor: isDark
+                          ? Colors.white.withValues(alpha: 0.07)
+                          : Colors.black.withValues(alpha: 0.05),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -142,22 +144,20 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                     children: [
                       Text(
                         'Pages (${_pages.length})',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       ElevatedButton.icon(
                         onPressed: _pickPages,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         icon: const Icon(Icons.add_photo_alternate,
-                            color: Colors.white, size: 18),
-                        label: const Text('Add Pages',
-                            style: TextStyle(color: Colors.white)),
+                            size: 18),
+                        label: const Text('Add Pages'),
                       ),
                     ],
                   ),
@@ -167,10 +167,12 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                       width: double.infinity,
                       height: 150,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : Colors.black.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                            color: Colors.grey.withOpacity(0.3)),
+                            color: Colors.grey.withValues(alpha: 0.3)),
                       ),
                       child: const Center(
                         child: Text(
@@ -196,7 +198,7 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.memory(
+                              child: Image.file(
                                 _pages[index],
                                 width: double.infinity,
                                 height: double.infinity,
@@ -226,7 +228,8 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.7),
+                                  color:
+                                      Colors.black.withValues(alpha: 0.7),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -247,7 +250,8 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                     child: ElevatedButton(
                       onPressed: _submit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -255,13 +259,13 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                       child: const Text(
                         'Upload Chapter',
                         style: TextStyle(
-                          color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),

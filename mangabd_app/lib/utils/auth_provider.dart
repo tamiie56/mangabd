@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 import '../services/auth/auth_service.dart';
+import '../services/firestore/firestore_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
+  final FirestoreService _firestoreService = FirestoreService();
   UserModel? _user;
   bool _isLoading = false;
 
@@ -23,11 +25,14 @@ class AuthProvider extends ChangeNotifier {
         _user = null;
         notifyListeners();
       } else {
-        if (_user == null) {
-          final doc = await _authService.getUserFromFirestore(firebaseUser.uid);
-          _user = doc;
+        final doc =
+            await _authService.getUserFromFirestore(firebaseUser.uid);
+        _user = doc;
+        notifyListeners();
+        _firestoreService.getUserStream(firebaseUser.uid).listen((updatedUser) {
+          _user = updatedUser;
           notifyListeners();
-        }
+        });
       }
     });
   }
@@ -73,5 +78,44 @@ class AuthProvider extends ChangeNotifier {
     await _authService.signOut();
     _user = null;
     notifyListeners();
+  }
+
+  Future<bool> updateDisplayName(String newName) async {
+    if (_user == null) return false;
+    try {
+      await _firestoreService.updateUserProfile(
+          _user!.uid, {'displayName': newName});
+      await FirebaseAuth.instance.currentUser
+          ?.updateDisplayName(newName);
+      _user = _user!.copyWith(displayName: newName);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updatePhotoUrl(String url) async {
+    if (_user == null) return false;
+    try {
+      await _firestoreService
+          .updateUserProfile(_user!.uid, {'photoUrl': url});
+      await FirebaseAuth.instance.currentUser?.updatePhotoURL(url);
+      _user = _user!.copyWith(photoUrl: url);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> refreshUser() async {
+    if (_user == null) return;
+    final updated =
+        await _firestoreService.getUserById(_user!.uid);
+    if (updated != null) {
+      _user = updated;
+      notifyListeners();
+    }
   }
 }
