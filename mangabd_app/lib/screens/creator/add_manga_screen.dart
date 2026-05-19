@@ -105,8 +105,8 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
                   height: 160,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                         color: colorScheme.primary, width: 2),
@@ -143,8 +143,8 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
                 hintText: 'Enter manga title',
                 filled: true,
                 fillColor: isDark
-                    ? Colors.white.withOpacity(0.07)
-                    : Colors.black.withOpacity(0.05),
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : Colors.black.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -162,8 +162,8 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
                 hintText: 'Enter manga description',
                 filled: true,
                 fillColor: isDark
-                    ? Colors.white.withOpacity(0.07)
-                    : Colors.black.withOpacity(0.05),
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : Colors.black.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -196,15 +196,13 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
                       border: Border.all(
                         color: selected
                             ? colorScheme.primary
-                            : Colors.grey.withOpacity(0.4),
+                            : Colors.grey.withValues(alpha: 0.4),
                       ),
                     ),
                     child: Text(
                       genre,
                       style: TextStyle(
-                        color: selected
-                            ? Colors.white
-                            : Colors.grey,
+                        color: selected ? Colors.white : Colors.grey,
                         fontSize: 13,
                       ),
                     ),

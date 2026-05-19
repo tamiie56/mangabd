@@ -44,7 +44,7 @@ class BookmarksScreen extends StatelessWidget {
                   Icon(
                     Icons.bookmark_outline,
                     size: 64,
-                    color: colorScheme.primary.withOpacity(0.4),
+                    color: colorScheme.primary.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -94,14 +94,14 @@ class BookmarksScreen extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.05)
+                        ? Colors.white.withValues(alpha: 0.05)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: isDark
                         ? []
                         : [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: Colors.black.withValues(alpha: 0.08),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -115,14 +115,17 @@ class BookmarksScreen extends StatelessWidget {
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(12),
                           ),
-                          child: (b['coverUrl'] ?? '').toString().isNotEmpty
+                          child: (b['coverUrl'] ?? '')
+                                  .toString()
+                                  .isNotEmpty
                               ? Image.network(
                                   b['coverUrl'],
                                   width: double.infinity,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
+                                  errorBuilder: (ctx, err, st) =>
+                                      Container(
                                     color: colorScheme.primary
-                                        .withOpacity(0.2),
+                                        .withValues(alpha: 0.2),
                                     child: Center(
                                       child: Icon(Icons.menu_book,
                                           color: colorScheme.primary,
@@ -132,7 +135,7 @@ class BookmarksScreen extends StatelessWidget {
                                 )
                               : Container(
                                   color: colorScheme.primary
-                                      .withOpacity(0.2),
+                                      .withValues(alpha: 0.2),
                                   child: Center(
                                     child: Icon(Icons.menu_book,
                                         color: colorScheme.primary,

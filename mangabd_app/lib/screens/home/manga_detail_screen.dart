@@ -74,7 +74,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
             actions: [
               IconButton(
                 icon: Icon(
-                  _isBookmarked ? Icons.bookmark : Icons.bookmark_outline,
+                  _isBookmarked
+                      ? Icons.bookmark
+                      : Icons.bookmark_outline,
                   color: _isBookmarked
                       ? colorScheme.primary
                       : Colors.white,
@@ -87,7 +89,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   ? Image.network(widget.manga.coverUrl,
                       fit: BoxFit.cover)
                   : Container(
-                      color: colorScheme.primary.withOpacity(0.3),
+                      color:
+                          colorScheme.primary.withValues(alpha: 0.3),
                       child: Center(
                         child: Icon(Icons.menu_book,
                             color: colorScheme.primary, size: 80),
@@ -115,13 +118,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         child: Text(
                           'by ${widget.manga.creatorName}',
                           style: TextStyle(
-                              color: colorScheme.primary, fontSize: 14),
+                              color: colorScheme.primary,
+                              fontSize: 14),
                         ),
                       ),
                       if (!isOwnManga)
                         StreamBuilder<int>(
-                          stream: _firestoreService
-                              .getFollowerCount(widget.manga.creatorId),
+                          stream: _firestoreService.getFollowerCount(
+                              widget.manga.creatorId),
                           builder: (context, snapshot) {
                             final count = snapshot.data ?? 0;
                             return OutlinedButton.icon(
@@ -164,13 +168,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: colorScheme.primary.withOpacity(0.15),
+                          color: colorScheme.primary
+                              .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           genre,
                           style: TextStyle(
-                              color: colorScheme.primary, fontSize: 12),
+                              color: colorScheme.primary,
+                              fontSize: 12),
                         ),
                       );
                     }).toList(),
@@ -179,7 +185,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                   Text(
                     widget.manga.description,
                     style: TextStyle(
-                      color: isDark ? Colors.grey[400] : Colors.grey[700],
+                      color: isDark
+                          ? Colors.grey[400]
+                          : Colors.grey[700],
                       fontSize: 14,
                     ),
                   ),
@@ -233,8 +241,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color:
-                              colorScheme.primary.withOpacity(0.15),
+                          color: colorScheme.primary
+                              .withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
@@ -252,7 +260,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                       ),
                       subtitle: Text(
                         '${chapter.pageUrls.length} pages',
-                        style: const TextStyle(color: Colors.grey),
+                        style:
+                            const TextStyle(color: Colors.grey),
                       ),
                       trailing: Icon(Icons.play_arrow,
                           color: colorScheme.primary),

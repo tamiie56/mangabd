@@ -60,10 +60,12 @@ class _SearchScreenState extends State<SearchScreen> {
             hintText: 'Search manga...',
             hintStyle: const TextStyle(color: Colors.grey),
             border: InputBorder.none,
-            prefixIcon: const Icon(Icons.search, color: Colors.grey),
+            prefixIcon:
+                const Icon(Icons.search, color: Colors.grey),
             suffixIcon: _controller.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.grey),
+                    icon:
+                        const Icon(Icons.clear, color: Colors.grey),
                     onPressed: () {
                       _controller.clear();
                       _onSearch('');
@@ -83,13 +85,15 @@ class _SearchScreenState extends State<SearchScreen> {
                       Icon(
                         Icons.search,
                         size: 64,
-                        color: colorScheme.primary.withOpacity(0.4),
+                        color: colorScheme.primary
+                            .withValues(alpha: 0.4),
                       ),
                       const SizedBox(height: 16),
                       const Text(
                         'Search for manga',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
                       const Text(
@@ -107,7 +111,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           Icon(
                             Icons.search_off,
                             size: 64,
-                            color: colorScheme.primary.withOpacity(0.4),
+                            color: colorScheme.primary
+                                .withValues(alpha: 0.4),
                           ),
                           const SizedBox(height: 16),
                           const Text(
@@ -151,15 +156,17 @@ class _SearchScreenState extends State<SearchScreen> {
                           child: Container(
                             decoration: BoxDecoration(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.05)
+                                  ? Colors.white
+                                      .withValues(alpha: 0.05)
                                   : Colors.white,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius:
+                                  BorderRadius.circular(12),
                               boxShadow: isDark
                                   ? []
                                   : [
                                       BoxShadow(
                                         color: Colors.black
-                                            .withOpacity(0.08),
+                                            .withValues(alpha: 0.08),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -181,27 +188,32 @@ class _SearchScreenState extends State<SearchScreen> {
                                             width: double.infinity,
                                             fit: BoxFit.cover,
                                             errorBuilder:
-                                                (_, __, ___) => Container(
-                                              color: colorScheme.primary
-                                                  .withOpacity(0.2),
+                                                (ctx, err, st) =>
+                                                    Container(
+                                              color: colorScheme
+                                                  .primary
+                                                  .withValues(
+                                                      alpha: 0.2),
                                               child: Center(
                                                 child: Icon(
-                                                    Icons.menu_book,
-                                                    color: colorScheme
-                                                        .primary,
-                                                    size: 48),
+                                                  Icons.menu_book,
+                                                  color: colorScheme
+                                                      .primary,
+                                                  size: 48,
+                                                ),
                                               ),
                                             ),
                                           )
                                         : Container(
                                             color: colorScheme.primary
-                                                .withOpacity(0.2),
+                                                .withValues(alpha: 0.2),
                                             child: Center(
                                               child: Icon(
-                                                  Icons.menu_book,
-                                                  color:
-                                                      colorScheme.primary,
-                                                  size: 48),
+                                                Icons.menu_book,
+                                                color:
+                                                    colorScheme.primary,
+                                                size: 48,
+                                              ),
                                             ),
                                           ),
                                   ),
@@ -219,7 +231,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                           fontSize: 13,
                                         ),
                                         maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
+                                        overflow:
+                                            TextOverflow.ellipsis,
                                       ),
                                       const SizedBox(height: 4),
                                       Text(

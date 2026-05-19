@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.15),
+                    color: colorScheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Icon(
@@ -86,14 +86,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'Email',
                     filled: true,
                     fillColor: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon:
-                        const Icon(Icons.email_outlined, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.email_outlined,
+                        color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -104,14 +104,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: 'Password',
                     filled: true,
                     fillColor: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon:
-                        const Icon(Icons.lock_outline, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.lock_outline,
+                        color: Colors.grey),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword

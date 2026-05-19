@@ -89,14 +89,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     hintText: 'Display Name',
                     filled: true,
                     fillColor: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon:
-                        const Icon(Icons.person_outline, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.person_outline,
+                        color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -107,14 +107,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     hintText: 'Email',
                     filled: true,
                     fillColor: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon:
-                        const Icon(Icons.email_outlined, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.email_outlined,
+                        color: Colors.grey),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -125,14 +125,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     hintText: 'Password',
                     filled: true,
                     fillColor: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    prefixIcon:
-                        const Icon(Icons.lock_outline, color: Colors.grey),
+                    prefixIcon: const Icon(Icons.lock_outline,
+                        color: Colors.grey),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscurePassword
@@ -151,8 +151,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
                     color: isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : Colors.black.withOpacity(0.05),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : Colors.black.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -163,7 +163,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         children: [
                           const Text(
                             'Register as Creator',
-                            style: TextStyle(fontWeight: FontWeight.w600),
+                            style:
+                                TextStyle(fontWeight: FontWeight.w600),
                           ),
                           Text(
                             'Upload and manage manga',
@@ -180,7 +181,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         value: _isCreator,
                         onChanged: (val) =>
                             setState(() => _isCreator = val),
-                        activeColor: colorScheme.primary,
+                        activeThumbColor: colorScheme.primary,
                       ),
                     ],
                   ),

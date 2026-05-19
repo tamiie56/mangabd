@@ -47,7 +47,7 @@ class CreatorDashboardScreen extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .primary
-                        .withOpacity(0.4),
+                        .withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -72,18 +72,19 @@ class CreatorDashboardScreen extends StatelessWidget {
               final manga = mangas[index];
               final isDark =
                   Theme.of(context).brightness == Brightness.dark;
+              final colorScheme = Theme.of(context).colorScheme;
               return Container(
                 margin: const EdgeInsets.only(bottom: 12),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withOpacity(0.05)
-                      : Colors.black.withOpacity(0.04),
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : Colors.black.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withOpacity(0.08)
-                        : Colors.black.withOpacity(0.08),
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : Colors.black.withValues(alpha: 0.08),
                   ),
                 ),
                 child: Row(
@@ -100,15 +101,11 @@ class CreatorDashboardScreen extends StatelessWidget {
                           : Container(
                               width: 60,
                               height: 80,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withOpacity(0.2),
+                              color: colorScheme.primary
+                                  .withValues(alpha: 0.2),
                               child: Icon(
                                 Icons.menu_book,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary,
+                                color: colorScheme.primary,
                               ),
                             ),
                     ),
@@ -135,9 +132,7 @@ class CreatorDashboardScreen extends StatelessWidget {
                             Text(
                               manga.genres.join(', '),
                               style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary,
+                                color: colorScheme.primary,
                                 fontSize: 12,
                               ),
                             ),
@@ -190,8 +185,8 @@ class CreatorDashboardScreen extends StatelessWidget {
                                   onPressed: () =>
                                       Navigator.pop(context, true),
                                   child: const Text('Delete',
-                                      style:
-                                          TextStyle(color: Colors.red)),
+                                      style: TextStyle(
+                                          color: Colors.red)),
                                 ),
                               ],
                             ),
@@ -221,7 +216,8 @@ class CreatorDashboardScreen extends StatelessWidget {
                                   color: Colors.red, size: 18),
                               SizedBox(width: 8),
                               Text('Delete',
-                                  style: TextStyle(color: Colors.red)),
+                                  style:
+                                      TextStyle(color: Colors.red)),
                             ],
                           ),
                         ),

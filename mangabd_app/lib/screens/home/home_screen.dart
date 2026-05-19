@@ -85,7 +85,7 @@ class _ForYouTab extends StatelessWidget {
                   color: Theme.of(context)
                       .colorScheme
                       .primary
-                      .withOpacity(0.4),
+                      .withValues(alpha: 0.4),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -118,7 +118,8 @@ class _FollowingTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (userId.isEmpty) {
       return const Center(
-        child: Text('Please login', style: TextStyle(color: Colors.grey)),
+        child: Text('Please login',
+            style: TextStyle(color: Colors.grey)),
       );
     }
 
@@ -139,7 +140,7 @@ class _FollowingTab extends StatelessWidget {
                   color: Theme.of(context)
                       .colorScheme
                       .primary
-                      .withOpacity(0.4),
+                      .withValues(alpha: 0.4),
                 ),
                 const SizedBox(height: 16),
                 const Text(
@@ -198,17 +199,19 @@ class _MangaCard extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (_) => MangaDetailScreen(manga: manga)),
+            builder: (ctx) => MangaDetailScreen(manga: manga)),
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: isDark
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: Colors.black.withValues(alpha: 0.08),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -227,8 +230,9 @@ class _MangaCard extends StatelessWidget {
                         manga.coverUrl,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: colorScheme.primary.withOpacity(0.2),
+                        errorBuilder: (ctx, err, st) => Container(
+                          color:
+                              colorScheme.primary.withValues(alpha: 0.2),
                           child: Center(
                             child: Icon(Icons.menu_book,
                                 color: colorScheme.primary, size: 48),
@@ -236,7 +240,8 @@ class _MangaCard extends StatelessWidget {
                         ),
                       )
                     : Container(
-                        color: colorScheme.primary.withOpacity(0.2),
+                        color:
+                            colorScheme.primary.withValues(alpha: 0.2),
                         child: Center(
                           child: Icon(Icons.menu_book,
                               color: colorScheme.primary, size: 48),

@@ -74,7 +74,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
                                 color: Colors.deepPurple,
                                 value: loadingProgress.expectedTotalBytes !=
                                         null
-                                    ? loadingProgress.cumulativeBytesLoaded /
+                                    ? loadingProgress
+                                            .cumulativeBytesLoaded /
                                         loadingProgress.expectedTotalBytes!
                                     : null,
                               ),
@@ -98,7 +99,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.8),
+                        Colors.black.withValues(alpha: 0.8),
                         Colors.transparent,
                       ],
                     ),
