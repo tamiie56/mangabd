@@ -3,8 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'utils/auth_provider.dart';
+import 'utils/theme_provider.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/main_screen.dart'; // ← এটা add করো, HomeScreen import সরাও
+import 'screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,15 +23,17 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'MangaBD',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: const AuthWrapper(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            title: 'MangaBD',
+            debugShowCheckedModeBanner: false,
+            theme: themeProvider.theme,
+            home: const AuthWrapper(),
+          );
+        },
       ),
     );
   }
@@ -43,7 +46,7 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     if (auth.isLoggedIn) {
-      return const MainScreen(); // ← HomeScreen থেকে MainScreen করো
+      return const MainScreen();
     }
     return const LoginScreen();
   }

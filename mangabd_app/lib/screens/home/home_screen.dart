@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../utils/auth_provider.dart';
+import '../../utils/theme_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
-import '../creator/creator_dashboard_screen.dart';
 import '../home/manga_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,38 +12,38 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDark;
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFF0D0D0D),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF1A1A1A),
-          title: const Text(
+          title: Text(
             'MangaBD',
             style: TextStyle(
-              color: Colors.white,
+              color: isDark ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
             ),
           ),
           actions: [
-            if (auth.isCreator)
-              IconButton(
-                icon: const Icon(Icons.dashboard, color: Colors.white),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CreatorDashboardScreen(),
-                  ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: IconButton(
+                icon: Icon(
+                  isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                  color: isDark ? Colors.white : Colors.black,
                 ),
+                onPressed: () => themeProvider.toggleTheme(),
               ),
+            ),
           ],
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: Colors.deepPurpleAccent,
             labelColor: Colors.deepPurpleAccent,
             unselectedLabelColor: Colors.grey,
-            tabs: [
+            tabs: const [
               Tab(text: 'For You'),
               Tab(text: 'Following'),
             ],
@@ -155,6 +155,8 @@ class _MangaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.watch<ThemeProvider>().isDark;
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -162,8 +164,17 @@ class _MangaCard extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
           borderRadius: BorderRadius.circular(12),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,8 +206,8 @@ class _MangaCard extends StatelessWidget {
                 children: [
                   Text(
                     manga.title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
