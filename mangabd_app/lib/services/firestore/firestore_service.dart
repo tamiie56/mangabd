@@ -11,11 +11,9 @@ class FirestoreService {
         .collection('mangas')
         .orderBy('updatedAt', descending: true)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => MangaModel.fromMap(doc.data()))
-              .toList(),
-        );
+        .map((snapshot) => snapshot.docs
+            .map((doc) => MangaModel.fromMap(doc.data()))
+            .toList());
   }
 
   Stream<List<MangaModel>> getMangasByCreator(String creatorId) {
@@ -23,11 +21,9 @@ class FirestoreService {
         .collection('mangas')
         .where('creatorId', isEqualTo: creatorId)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => MangaModel.fromMap(doc.data()))
-              .toList(),
-        );
+        .map((snapshot) => snapshot.docs
+            .map((doc) => MangaModel.fromMap(doc.data()))
+            .toList());
   }
 
   Future<void> addManga(MangaModel manga) async {
@@ -43,17 +39,35 @@ class FirestoreService {
         .doc(mangaId)
         .collection('chapters')
         .get();
+
     final batch = _firestore.batch();
     for (final doc in chaptersSnap.docs) {
       batch.delete(doc.reference);
     }
     batch.delete(_firestore.collection('mangas').doc(mangaId));
     await batch.commit();
+
     await _firestore.collection('users').doc(creatorId).update({
       'totalWorks': FieldValue.increment(-1),
       'totalChaptersUploaded':
           FieldValue.increment(-chaptersSnap.docs.length),
     });
+
+    final usersSnap = await _firestore.collection('users').get();
+    for (final userDoc in usersSnap.docs) {
+      final bookmarkRef = _firestore
+          .collection('users')
+          .doc(userDoc.id)
+          .collection('bookmarks')
+          .doc(mangaId);
+      final bookmarkDoc = await bookmarkRef.get();
+      if (bookmarkDoc.exists) {
+        await bookmarkRef.delete();
+        await _firestore.collection('users').doc(userDoc.id).update({
+          'bookmarksCount': FieldValue.increment(-1),
+        });
+      }
+    }
   }
 
   Stream<List<ChapterModel>> getChapters(String mangaId) {
@@ -63,11 +77,9 @@ class FirestoreService {
         .collection('chapters')
         .orderBy('chapterNumber')
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => ChapterModel.fromMap(doc.data()))
-              .toList(),
-        );
+        .map((snapshot) => snapshot.docs
+            .map((doc) => ChapterModel.fromMap(doc.data()))
+            .toList());
   }
 
   Future<void> addChapter(ChapterModel chapter) async {
@@ -83,10 +95,8 @@ class FirestoreService {
       'updatedAt': DateTime.now().toIso8601String(),
     });
 
-    final mangaDoc = await _firestore
-        .collection('mangas')
-        .doc(chapter.mangaId)
-        .get();
+    final mangaDoc =
+        await _firestore.collection('mangas').doc(chapter.mangaId).get();
     if (mangaDoc.exists) {
       final creatorId = mangaDoc.data()?['creatorId'] as String?;
       if (creatorId != null) {
@@ -137,16 +147,16 @@ class FirestoreService {
         .collection('following')
         .snapshots()
         .asyncMap((followSnap) async {
-          if (followSnap.docs.isEmpty) return [];
-          final creatorIds = followSnap.docs.map((d) => d.id).toList();
-          final mangaSnap = await _firestore
-              .collection('mangas')
-              .where('creatorId', whereIn: creatorIds)
-              .get();
-          return mangaSnap.docs
-              .map((doc) => MangaModel.fromMap(doc.data()))
-              .toList();
-        });
+      if (followSnap.docs.isEmpty) return [];
+      final creatorIds = followSnap.docs.map((d) => d.id).toList();
+      final mangaSnap = await _firestore
+          .collection('mangas')
+          .where('creatorId', whereIn: creatorIds)
+          .get();
+      return mangaSnap.docs
+          .map((doc) => MangaModel.fromMap(doc.data()))
+          .toList();
+    });
   }
 
   Future<void> toggleBookmark(String userId, MangaModel manga) async {
@@ -194,8 +204,7 @@ class FirestoreService {
         .map((snap) => snap.docs.map((d) => d.data()).toList());
   }
 
-  Future<void> toggleFollow(
-      String currentUserId, String creatorId) async {
+  Future<void> toggleFollow(String currentUserId, String creatorId) async {
     final followingRef = _firestore
         .collection('users')
         .doc(currentUserId)
@@ -208,12 +217,10 @@ class FirestoreService {
         .doc(currentUserId);
 
     final doc = await followingRef.get();
-    final batch = _firestore.batch();
 
     if (doc.exists) {
-      batch.delete(followingRef);
-      batch.delete(followerRef);
-      await batch.commit();
+      await followingRef.delete();
+      await followerRef.delete();
       await _firestore.collection('users').doc(currentUserId).update({
         'followingCount': FieldValue.increment(-1),
       });
@@ -221,15 +228,14 @@ class FirestoreService {
         'followersCount': FieldValue.increment(-1),
       });
     } else {
-      batch.set(followingRef, {
+      await followingRef.set({
         'creatorId': creatorId,
         'followedAt': DateTime.now().toIso8601String(),
       });
-      batch.set(followerRef, {
+      await followerRef.set({
         'userId': currentUserId,
         'followedAt': DateTime.now().toIso8601String(),
       });
-      await batch.commit();
       await _firestore.collection('users').doc(currentUserId).update({
         'followingCount': FieldValue.increment(1),
       });
@@ -239,8 +245,7 @@ class FirestoreService {
     }
   }
 
-  Future<bool> isFollowing(
-      String currentUserId, String creatorId) async {
+  Future<bool> isFollowing(String currentUserId, String creatorId) async {
     final doc = await _firestore
         .collection('users')
         .doc(currentUserId)
@@ -254,13 +259,11 @@ class FirestoreService {
     return _firestore
         .collection('users')
         .doc(creatorId)
-        .collection('followers')
         .snapshots()
-        .map((snap) => snap.docs.length);
+        .map((doc) => doc.data()?['followersCount'] ?? 0);
   }
 
-  Future<void> updateManga(
-      String mangaId, Map<String, dynamic> data) async {
+  Future<void> updateManga(String mangaId, Map<String, dynamic> data) async {
     await _firestore.collection('mangas').doc(mangaId).update(data);
   }
 
@@ -272,8 +275,7 @@ class FirestoreService {
 
   Future<UserModel?> getUserById(String uid) async {
     try {
-      final doc =
-          await _firestore.collection('users').doc(uid).get();
+      final doc = await _firestore.collection('users').doc(uid).get();
       if (doc.exists) return UserModel.fromMap(doc.data()!);
       return null;
     } catch (e) {
@@ -281,8 +283,7 @@ class FirestoreService {
     }
   }
 
-  Future<void> updateUserProfile(
-      String uid, Map<String, dynamic> data) async {
+  Future<void> updateUserProfile(String uid, Map<String, dynamic> data) async {
     await _firestore.collection('users').doc(uid).update(data);
   }
 

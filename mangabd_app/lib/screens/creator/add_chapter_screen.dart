@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'dart:typed_data';
 import '../../models/chapter_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../../services/storage/storage_service.dart';
@@ -21,7 +21,7 @@ class AddChapterScreen extends StatefulWidget {
 
 class _AddChapterScreenState extends State<AddChapterScreen> {
   final _titleController = TextEditingController();
-  final List<File> _pages = [];
+  final List<Uint8List> _pages = [];
   bool _isLoading = false;
 
   @override
@@ -34,7 +34,8 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
     final picker = ImagePicker();
     final images = await picker.pickMultiImage(imageQuality: 80);
     for (final image in images) {
-      setState(() => _pages.add(File(image.path)));
+      final bytes = await image.readAsBytes();
+      setState(() => _pages.add(bytes));
     }
   }
 
@@ -62,7 +63,7 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
 
     final List<String> pageUrls = [];
     for (int i = 0; i < _pages.length; i++) {
-      final url = await storageService.uploadChapterPage(
+      final url = await storageService.uploadChapterPageBytes(
         widget.mangaId,
         chapterId,
         'page_$i',
@@ -144,7 +145,8 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                     children: [
                       Text(
                         'Pages (${_pages.length})',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold),
                       ),
                       ElevatedButton.icon(
                         onPressed: _pickPages,
@@ -172,7 +174,8 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                             : Colors.black.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                            color: Colors.grey.withValues(alpha: 0.3)),
+                            color:
+                                Colors.grey.withValues(alpha: 0.3)),
                       ),
                       child: const Center(
                         child: Text(
@@ -198,7 +201,7 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
+                              child: Image.memory(
                                 _pages[index],
                                 width: double.infinity,
                                 height: double.infinity,
@@ -228,14 +231,16 @@ class _AddChapterScreenState extends State<AddChapterScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color:
-                                      Colors.black.withValues(alpha: 0.7),
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: Colors.black
+                                      .withValues(alpha: 0.7),
+                                  borderRadius:
+                                      BorderRadius.circular(4),
                                 ),
                                 child: Text(
                                   '${index + 1}',
                                   style: const TextStyle(
-                                      color: Colors.white, fontSize: 11),
+                                      color: Colors.white,
+                                      fontSize: 11),
                                 ),
                               ),
                             ),

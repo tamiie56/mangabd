@@ -1,40 +1,49 @@
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  static const String _uploadPreset = 'mangabd_preset';
+  static const String _baseUrl =
+      'https://api.cloudinary.com/v1_1/dbabkcit1/image/upload';
 
-  Future<String?> uploadCoverImage(String mangaId, File file) async {
+  Future<String?> uploadCoverImageBytes(
+      String mangaId, Uint8List bytes) async {
     try {
-      final ref = _storage.ref().child('covers/$mangaId.jpg');
-      await ref.putFile(file);
-      return await ref.getDownloadURL();
+      final uri = Uri.parse(_baseUrl);
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['upload_preset'] = _uploadPreset
+        ..fields['public_id'] = 'covers/$mangaId'
+        ..files.add(http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: '$mangaId.jpg',
+        ));
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      final json = jsonDecode(body);
+      return json['secure_url'] as String?;
     } catch (e) {
       return null;
     }
   }
 
-  Future<String?> uploadChapterPage(
-      String mangaId, String chapterId, String pageId, File file) async {
+  Future<String?> uploadChapterPageBytes(
+      String mangaId, String chapterId, String pageId, Uint8List bytes) async {
     try {
-      final ref =
-          _storage.ref().child('chapters/$mangaId/$chapterId/$pageId.jpg');
-      await ref.putFile(file);
-      return await ref.getDownloadURL();
-    } catch (e) {
-      return null;
-    }
-  }
-
-  Future<String?> uploadProfilePhoto(String userId, File file) async {
-    try {
-      final ref = _storage.ref().child('profiles/$userId.jpg');
-      await ref.putFile(
-        file,
-        SettableMetadata(contentType: 'image/jpeg'),
-      );
-      return await ref.getDownloadURL();
+      final uri = Uri.parse(_baseUrl);
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['upload_preset'] = _uploadPreset
+        ..fields['public_id'] = 'chapters/$mangaId/$chapterId/$pageId'
+        ..files.add(http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: '$pageId.jpg',
+        ));
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      final json = jsonDecode(body);
+      return json['secure_url'] as String?;
     } catch (e) {
       return null;
     }
@@ -43,23 +52,21 @@ class StorageService {
   Future<String?> uploadProfilePhotoBytes(
       String userId, Uint8List bytes) async {
     try {
-      final ref = _storage.ref().child('profiles/$userId.jpg');
-      await ref.putData(
-        bytes,
-        SettableMetadata(contentType: 'image/jpeg'),
-      );
-      return await ref.getDownloadURL();
+      final uri = Uri.parse(_baseUrl);
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['upload_preset'] = _uploadPreset
+        ..fields['public_id'] = 'profiles/$userId'
+        ..files.add(http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: '$userId.jpg',
+        ));
+      final response = await request.send();
+      final body = await response.stream.bytesToString();
+      final json = jsonDecode(body);
+      return json['secure_url'] as String?;
     } catch (e) {
       return null;
-    }
-  }
-
-  Future<void> deleteFile(String url) async {
-    try {
-      final ref = _storage.refFromURL(url);
-      await ref.delete();
-    } catch (e) {
-      return;
     }
   }
 }

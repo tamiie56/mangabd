@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'dart:typed_data';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../../services/storage/storage_service.dart';
@@ -23,7 +23,7 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
   ];
   late List<String> _selectedGenres;
   bool _isLoading = false;
-  File? _newCoverFile;
+  Uint8List? _newCoverBytes;
 
   @override
   void initState() {
@@ -49,7 +49,8 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
       maxWidth: 600,
     );
     if (image != null) {
-      setState(() => _newCoverFile = File(image.path));
+      final bytes = await image.readAsBytes();
+      setState(() => _newCoverBytes = bytes);
     }
   }
 
@@ -63,9 +64,10 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
     setState(() => _isLoading = true);
 
     String coverUrl = widget.manga.coverUrl;
-    if (_newCoverFile != null) {
+    if (_newCoverBytes != null) {
       coverUrl =
-          await StorageService().uploadCoverImage(widget.manga.id, _newCoverFile!) ??
+          await StorageService().uploadCoverImageBytes(
+                  widget.manga.id, _newCoverBytes!) ??
               coverUrl;
     }
 
@@ -114,11 +116,11 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
                     border: Border.all(
                         color: colorScheme.primary, width: 2),
                   ),
-                  child: _newCoverFile != null
+                  child: _newCoverBytes != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.file(
-                            _newCoverFile!,
+                          child: Image.memory(
+                            _newCoverBytes!,
                             fit: BoxFit.cover,
                           ),
                         )
@@ -131,14 +133,17 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
                               ),
                             )
                           : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment:
+                                  MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.add_photo_alternate,
-                                    color: colorScheme.primary, size: 40),
+                                    color: colorScheme.primary,
+                                    size: 40),
                                 const SizedBox(height: 8),
                                 const Text('Change Cover',
                                     style: TextStyle(
-                                        color: Colors.grey, fontSize: 12)),
+                                        color: Colors.grey,
+                                        fontSize: 12)),
                               ],
                             ),
                 ),
@@ -213,7 +218,8 @@ class _EditMangaScreenState extends State<EditMangaScreen> {
                     child: Text(
                       genre,
                       style: TextStyle(
-                        color: selected ? Colors.white : Colors.grey,
+                        color:
+                            selected ? Colors.white : Colors.grey,
                         fontSize: 13,
                       ),
                     ),

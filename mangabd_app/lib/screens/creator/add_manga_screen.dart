@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'dart:typed_data';
 import '../../utils/auth_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
@@ -24,7 +24,7 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
   ];
   final List<String> _selectedGenres = [];
   bool _isLoading = false;
-  File? _coverFile;
+  Uint8List? _coverBytes;
 
   @override
   void dispose() {
@@ -41,7 +41,8 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
       maxWidth: 600,
     );
     if (image != null) {
-      setState(() => _coverFile = File(image.path));
+      final bytes = await image.readAsBytes();
+      setState(() => _coverBytes = bytes);
     }
   }
 
@@ -57,9 +58,9 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
     final mangaId = DateTime.now().millisecondsSinceEpoch.toString();
 
     String coverUrl = '';
-    if (_coverFile != null) {
+    if (_coverBytes != null) {
       coverUrl =
-          await StorageService().uploadCoverImage(mangaId, _coverFile!) ?? '';
+          await StorageService().uploadCoverImageBytes(mangaId, _coverBytes!) ?? '';
     }
 
     final manga = MangaModel(
@@ -111,11 +112,11 @@ class _AddMangaScreenState extends State<AddMangaScreen> {
                     border: Border.all(
                         color: colorScheme.primary, width: 2),
                   ),
-                  child: _coverFile != null
+                  child: _coverBytes != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.file(
-                            _coverFile!,
+                          child: Image.memory(
+                            _coverBytes!,
                             fit: BoxFit.cover,
                           ),
                         )
