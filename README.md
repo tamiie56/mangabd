@@ -14,43 +14,45 @@ Get the latest release from [Releases](https://github.com/tamiie56/mangabd/relea
 mangabd/
 ├── mangabd_app/
 │   ├── lib/
-│   │   ├── main.dart                            # App entry point & auth wrapper
+│   │   ├── main.dart
 │   │   ├── models/
-│   │   │   ├── manga_model.dart                 # Manga model
-│   │   │   └── chapter_model.dart               # Chapter model
+│   │   │   ├── manga_model.dart
+│   │   │   ├── chapter_model.dart
+│   │   │   └── user_model.dart
 │   │   ├── services/
 │   │   │   ├── auth/
-│   │   │   │   └── auth_service.dart            # Firebase auth service
+│   │   │   │   └── auth_service.dart
 │   │   │   ├── firestore/
-│   │   │   │   └── firestore_service.dart       # Firestore CRUD + queries
+│   │   │   │   └── firestore_service.dart
 │   │   │   └── storage/
-│   │   │       └── storage_service.dart         # Cloudinary upload service
+│   │   │       └── storage_service.dart
 │   │   ├── screens/
 │   │   │   ├── auth/
-│   │   │   │   ├── login_screen.dart            # Login screen
-│   │   │   │   └── signup_screen.dart           # Signup screen
+│   │   │   │   ├── login_screen.dart
+│   │   │   │   └── signup_screen.dart
 │   │   │   ├── home/
-│   │   │   │   ├── home_screen.dart             # Home feed (For You + Following tabs)
-│   │   │   │   └── manga_detail_screen.dart     # Manga detail + chapter list
+│   │   │   │   ├── home_screen.dart
+│   │   │   │   └── manga_detail_screen.dart
 │   │   │   ├── search/
-│   │   │   │   └── search_screen.dart           # Search manga by title
+│   │   │   │   └── search_screen.dart
 │   │   │   ├── bookmarks/
-│   │   │   │   └── bookmarks_screen.dart        # Saved bookmarks
+│   │   │   │   └── bookmarks_screen.dart
 │   │   │   ├── reader/
-│   │   │   │   └── reader_screen.dart           # Chapter reader
+│   │   │   │   └── reader_screen.dart
 │   │   │   ├── creator/
-│   │   │   │   ├── creator_dashboard_screen.dart  # Creator manga management
-│   │   │   │   ├── add_manga_screen.dart          # Upload new manga
-│   │   │   │   ├── edit_manga_screen.dart         # Edit existing manga
-│   │   │   │   └── add_chapter_screen.dart        # Upload new chapter
+│   │   │   │   ├── creator_dashboard_screen.dart
+│   │   │   │   ├── add_manga_screen.dart
+│   │   │   │   ├── edit_manga_screen.dart
+│   │   │   │   └── add_chapter_screen.dart
 │   │   │   └── profile/
-│   │   │       └── profile_screen.dart          # User profile + logout
+│   │   │       └── profile_screen.dart
 │   │   ├── utils/
-│   │   │   └── auth_provider.dart               # Auth state management
-│   │   └── main_screen.dart                     # Bottom navigation controller
+│   │   │   ├── auth_provider.dart
+│   │   │   └── theme_provider.dart
+│   │   └── main_screen.dart
 │   ├── assets/
 │   │   └── logo/
-│   │       └── mangabd_logo.png                 # App launcher icon
+│   │       └── mangabd_logo.png
 │   └── pubspec.yaml
 ├── android/
 └── firestore_rules/
@@ -62,23 +64,27 @@ mangabd/
 
 | Feature | Status |
 | --- | --- |
-| Email / Password Authentication | Done |
-| Home Feed — For You tab | Done |
-| Home Feed — Following tab | Done |
-| Manga Detail Page | Done |
-| Chapter Reader | Done |
-| Search Manga by Title | Done |
-| Bookmark Manga | Done |
-| Follow / Unfollow Creators | Done |
-| Follower Count | Done |
-| Creator Dashboard | Done |
-| Upload New Manga with Cover | Done |
-| Upload Chapters with Pages | Done |
-| Edit Manga | Done |
-| Delete Manga | Done |
-| User Profile Screen | Done |
-| Dark Themed UI | Done |
-| Android APK Build | Done |
+| Email / Password Authentication | ✅ Done |
+| Home Feed — For You tab | ✅ Done |
+| Home Feed — Following tab | ✅ Done |
+| Manga Detail Page | ✅ Done |
+| Chapter Reader | ✅ Done |
+| Search Manga by Title | ✅ Done |
+| Bookmark Manga | ✅ Done |
+| Follow / Unfollow Creators | ✅ Done |
+| Follower / Following Count | ✅ Done |
+| Creator Dashboard | ✅ Done |
+| Upload New Manga with Cover | ✅ Done |
+| Upload Chapters with Pages | ✅ Done |
+| Edit Manga | ✅ Done |
+| Delete Manga (with bookmark cleanup) | ✅ Done |
+| Profile Screen with Stats | ✅ Done |
+| Reader Stats (chapters read, bookmarks) | ✅ Done |
+| Creator Stats (total works, chapters uploaded) | ✅ Done |
+| Edit Profile Username | ✅ Done |
+| Profile Picture Upload | ✅ Done |
+| Dark / Light Theme Toggle | ✅ Done |
+| Android APK Build | ✅ Done |
 
 ---
 
@@ -86,7 +92,7 @@ mangabd/
 
 | Layer | Technology |
 | --- | --- |
-| Frontend | Flutter (Android) |
+| Frontend | Flutter |
 | Authentication | Firebase Authentication |
 | Database | Cloud Firestore |
 | File Storage | Cloudinary |
@@ -99,8 +105,8 @@ mangabd/
 ### Prerequisites
 
 - Flutter SDK
-- Firebase project (with Authentication and Firestore enabled)
-- Cloudinary account
+- Firebase project (Authentication + Firestore enabled)
+- Cloudinary account with an unsigned upload preset
 
 ### 1. Clone the repo
 
@@ -117,9 +123,16 @@ cd mangabd/mangabd_app
 - Download `google-services.json` and place it in `android/app/`
 - Run `flutterfire configure` to generate `lib/firebase_options.dart`
 
-### 3. Firestore Security Rules
+### 3. Cloudinary setup
 
-Go to Firestore > Rules and apply:
+- Create a free account at [cloudinary.com](https://cloudinary.com)
+- Go to Settings → Upload → Upload Presets
+- Create an **unsigned** preset
+- Update `lib/services/storage/storage_service.dart` with your cloud name and preset name
+
+### 4. Firestore Security Rules
+
+Go to Firestore → Rules and apply:
 
 ```
 rules_version = '2';
@@ -137,7 +150,8 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
 
       match /bookmarks/{bookmarkId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -155,13 +169,25 @@ service cloud.firestore {
 }
 ```
 
-### 4. Flutter setup
+### 5. New User Firestore Document Fields
+
+When a new user signs up, the following fields are automatically created in their Firestore document:
+
+```
+uid, email, displayName, photoUrl, isCreator, createdAt,
+followersCount, followingCount, bookmarksCount, chaptersRead,
+totalWorks, totalChaptersUploaded
+```
+
+> **Note:** If you have existing users created before v1.1.0, manually add the missing numeric fields (`followersCount`, `followingCount`, `bookmarksCount`, `chaptersRead`, `totalWorks`, `totalChaptersUploaded`) as `int64` with value `0` in Firestore Console.
+
+### 6. Flutter setup
 
 ```
 flutter pub get
 ```
 
-### 5. Run the app
+### 7. Run the app
 
 ```
 flutter run
@@ -186,7 +212,6 @@ APK will be at `build/app/outputs/flutter-apk/app-release.apk`
 | `firebase_core` | Firebase initialization |
 | `firebase_auth` | User authentication |
 | `cloud_firestore` | Database |
-| `firebase_storage` | File storage (backup) |
 | `provider` | State management |
 | `image_picker` | Pick images from gallery |
 | `http` | HTTP requests for Cloudinary |
