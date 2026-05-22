@@ -37,6 +37,7 @@ class _MainScreenState extends State<MainScreen> {
     final auth = context.watch<AuthProvider>();
     final isCreator = auth.isCreator;
     final screens = isCreator ? _creatorScreens : _screens;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (_currentIndex >= screens.length) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -49,38 +50,52 @@ class _MainScreenState extends State<MainScreen> {
         index: _currentIndex.clamp(0, screens.length - 1),
         children: screens,
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex.clamp(0, screens.length - 1),
-        onDestinationSelected: (index) =>
-            setState(() => _currentIndex = index),
-        destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'For You',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.search_outlined),
-            selectedIcon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          if (isCreator)
-            const NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard),
-              label: 'My Works',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
             ),
-          const NavigationDestination(
-            icon: Icon(Icons.bookmark_outline),
-            selectedIcon: Icon(Icons.bookmark),
-            label: 'Bookmarks',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+          ],
+        ),
+        child: NavigationBar(
+          selectedIndex: _currentIndex.clamp(0, screens.length - 1),
+          onDestinationSelected: (index) =>
+              setState(() => _currentIndex = index),
+          elevation: 0,
+          height: 64,
+          destinations: [
+            const NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home_rounded),
+              label: 'For You',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.search_rounded),
+              selectedIcon: Icon(Icons.search_rounded),
+              label: 'Search',
+            ),
+            if (isCreator)
+              const NavigationDestination(
+                icon: Icon(Icons.dashboard_outlined),
+                selectedIcon: Icon(Icons.dashboard_rounded),
+                label: 'My Works',
+              ),
+            const NavigationDestination(
+              icon: Icon(Icons.bookmark_outline_rounded),
+              selectedIcon: Icon(Icons.bookmark_rounded),
+              label: 'Bookmarks',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.person_outline_rounded),
+              selectedIcon: Icon(Icons.person_rounded),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

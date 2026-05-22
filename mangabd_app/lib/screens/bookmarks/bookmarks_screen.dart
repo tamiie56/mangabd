@@ -10,13 +10,13 @@ class BookmarksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (user == null) {
       return const Scaffold(
         body: Center(
-          child: Text('Please login', style: TextStyle(color: Colors.grey)),
+          child: Text('Please login',
+              style: TextStyle(color: Color(0xFF6B7280))),
         ),
       );
     }
@@ -26,14 +26,44 @@ class BookmarksScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
         title: const Text(
           'Bookmarks',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 22),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD60A).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.bookmark_rounded,
+                      color: Color(0xFFFFD60A), size: 16),
+                  SizedBox(width: 4),
+                  Text(
+                    'Saved',
+                    style: TextStyle(
+                      color: Color(0xFFFFD60A),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: FirestoreService().getBookmarks(user.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFFFF6B35)),
+            );
           }
           final bookmarks = snapshot.data ?? [];
           if (bookmarks.isEmpty) {
@@ -41,34 +71,40 @@ class BookmarksScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.bookmark_outline,
-                    size: 64,
-                    color: colorScheme.primary.withValues(alpha: 0.4),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFD60A).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: const Icon(Icons.bookmark_rounded,
+                        size: 40, color: Color(0xFFFFD60A)),
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     'No bookmarks yet.',
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   const Text(
                     'Bookmark manga to read them later.',
-                    style: TextStyle(color: Colors.grey),
+                    style:
+                        TextStyle(color: Color(0xFF6B7280), fontSize: 13),
                   ),
                 ],
               ),
             );
           }
           return GridView.builder(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             gridDelegate:
                 const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.65,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              childAspectRatio: 0.62,
+              crossAxisSpacing: 14,
+              mainAxisSpacing: 14,
             ),
             itemCount: bookmarks.length,
             itemBuilder: (context, index) {
@@ -93,19 +129,17 @@ class BookmarksScreen extends StatelessWidget {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.05)
-                        : Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                    color:
+                        isDark ? const Color(0xFF1A1D2E) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black
+                            .withValues(alpha: isDark ? 0.3 : 0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,47 +147,52 @@ class BookmarksScreen extends StatelessWidget {
                       Expanded(
                         child: ClipRRect(
                           borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(12),
+                            top: Radius.circular(16),
                           ),
-                          child: (b['coverUrl'] ?? '')
-                                  .toString()
-                                  .isNotEmpty
-                              ? Image.network(
-                                  b['coverUrl'],
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (ctx, err, st) =>
-                                      Container(
-                                    color: colorScheme.primary
-                                        .withValues(alpha: 0.2),
-                                    child: Center(
-                                      child: Icon(Icons.menu_book,
-                                          color: colorScheme.primary,
-                                          size: 48),
-                                    ),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              (b['coverUrl'] ?? '').toString().isNotEmpty
+                                  ? Image.network(
+                                      b['coverUrl'],
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (ctx, err, st) =>
+                                          _buildPlaceholder(),
+                                    )
+                                  : _buildPlaceholder(),
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFFD60A),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                )
-                              : Container(
-                                  color: colorScheme.primary
-                                      .withValues(alpha: 0.2),
-                                  child: Center(
-                                    child: Icon(Icons.menu_book,
-                                        color: colorScheme.primary,
-                                        size: 48),
+                                  child: const Icon(
+                                    Icons.bookmark_rounded,
+                                    color: Colors.white,
+                                    size: 14,
                                   ),
                                 ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               b['title'] ?? '',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
                                 fontSize: 13,
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF1A1D2E),
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -162,7 +201,7 @@ class BookmarksScreen extends StatelessWidget {
                             Text(
                               '${b['totalChapters'] ?? 0} chapters',
                               style: const TextStyle(
-                                  color: Colors.grey, fontSize: 11),
+                                  color: Color(0xFF6B7280), fontSize: 11),
                             ),
                           ],
                         ),
@@ -174,6 +213,21 @@ class BookmarksScreen extends StatelessWidget {
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: const Center(
+        child: Icon(Icons.menu_book_rounded, color: Colors.white, size: 48),
       ),
     );
   }
