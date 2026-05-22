@@ -43,7 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -126,9 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF1A1D2E)
-                          : Colors.white,
+                      color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
@@ -145,7 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
                             hintText: 'Email address',
-                            prefixIcon: Icon(Icons.email_outlined, color: Color(0xFFFF6B35)),
+                            prefixIcon: Icon(Icons.email_outlined,
+                                color: Color(0xFFFF6B35)),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -154,7 +152,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
                             hintText: 'Password',
-                            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFFFF6B35)),
+                            prefixIcon: const Icon(Icons.lock_outline,
+                                color: Color(0xFFFF6B35)),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
@@ -206,7 +205,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const SignupScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => const SignupScreen()),
                     ),
                     child: RichText(
                       text: TextSpan(

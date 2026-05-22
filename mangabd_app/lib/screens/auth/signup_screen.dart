@@ -104,7 +104,8 @@ class _SignupScreenState extends State<SignupScreen> {
               Expanded(
                 child: Center(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 28, vertical: 12),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -136,11 +137,14 @@ class _SignupScreenState extends State<SignupScreen> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
+                            color: isDark
+                                ? const Color(0xFF1A1D2E)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                                color: Colors.black.withValues(
+                                    alpha: isDark ? 0.3 : 0.08),
                                 blurRadius: 24,
                                 offset: const Offset(0, 8),
                               ),
@@ -153,7 +157,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                 textCapitalization: TextCapitalization.words,
                                 decoration: const InputDecoration(
                                   hintText: 'Display Name',
-                                  prefixIcon: Icon(Icons.person_outline_rounded,
+                                  prefixIcon: Icon(
+                                      Icons.person_outline_rounded,
                                       color: Color(0xFFFF6B35)),
                                 ),
                               ),
@@ -193,14 +198,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                     horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
                                   color: _isCreator
-                                      ? const Color(0xFFFF6B35).withValues(alpha: 0.1)
+                                      ? const Color(0xFFFF6B35)
+                                          .withValues(alpha: 0.1)
                                       : (isDark
                                           ? const Color(0xFF252839)
                                           : const Color(0xFFF3F4F6)),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
                                     color: _isCreator
-                                        ? const Color(0xFFFF6B35).withValues(alpha: 0.4)
+                                        ? const Color(0xFFFF6B35)
+                                            .withValues(alpha: 0.4)
                                         : Colors.transparent,
                                   ),
                                 ),
@@ -211,8 +218,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                       decoration: BoxDecoration(
                                         color: _isCreator
                                             ? const Color(0xFFFF6B35)
-                                            : const Color(0xFF6B7280).withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(10),
+                                            : const Color(0xFF6B7280)
+                                                .withValues(alpha: 0.2),
+                                        borderRadius:
+                                            BorderRadius.circular(10),
                                       ),
                                       child: Icon(
                                         Icons.draw_rounded,
@@ -225,7 +234,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Register as Creator',
@@ -251,9 +261,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ),
                                     Switch(
                                       value: _isCreator,
-                                      onChanged: (val) =>
-                                          setState(() => _isCreator = val),
-                                      activeColor: const Color(0xFFFF6B35),
+                                      onChanged: (val) => setState(
+                                          () => _isCreator = val),
+                                      activeThumbColor:
+                                          const Color(0xFFFF6B35),
                                     ),
                                   ],
                                 ),
@@ -268,7 +279,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                     backgroundColor: const Color(0xFFFF6B35),
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
+                                      borderRadius:
+                                          BorderRadius.circular(14),
                                     ),
                                     elevation: 0,
                                   ),

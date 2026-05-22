@@ -6,13 +6,10 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Current user stream
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Get current user
   User? get currentUser => _auth.currentUser;
 
-  // Sign up
   Future<UserModel?> signUp({
     required String email,
     required String password,
@@ -42,7 +39,6 @@ class AuthService {
     }
   }
 
-  // Sign in
   Future<UserModel?> signIn({
     required String email,
     required String password,
@@ -52,26 +48,43 @@ class AuthService {
         email: email,
         password: password,
       );
+      final firebaseUser = credential.user!;
       final doc = await _firestore
           .collection('users')
-          .doc(credential.user!.uid)
+          .doc(firebaseUser.uid)
           .get();
-      return UserModel.fromMap(doc.data()!);
+
+      if (doc.exists && doc.data() != null) {
+        return UserModel.fromMap(doc.data()!);
+      }
+
+      final userModel = UserModel(
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? email,
+        displayName: firebaseUser.displayName ?? email.split('@').first,
+        isCreator: false,
+        createdAt: DateTime.now(),
+      );
+      await _firestore
+          .collection('users')
+          .doc(firebaseUser.uid)
+          .set(userModel.toMap());
+      return userModel;
     } catch (e) {
       return null;
     }
   }
 
-  // Sign out
   Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  // Get user from Firestore
   Future<UserModel?> getUserFromFirestore(String uid) async {
     try {
       final doc = await _firestore.collection('users').doc(uid).get();
-      if (doc.exists) return UserModel.fromMap(doc.data()!);
+      if (doc.exists && doc.data() != null) {
+        return UserModel.fromMap(doc.data()!);
+      }
       return null;
     } catch (e) {
       return null;

@@ -26,7 +26,6 @@ class _ReaderScreenState extends State<ReaderScreen>
   bool _tracked = false;
   final FirestoreService _firestoreService = FirestoreService();
   late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -35,8 +34,6 @@ class _ReaderScreenState extends State<ReaderScreen>
       duration: const Duration(milliseconds: 250),
       vsync: this,
     );
-    _fadeAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_fadeController);
     _fadeController.forward();
     _trackRead();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
