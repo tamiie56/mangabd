@@ -181,6 +181,8 @@ totalWorks, totalChaptersUploaded
 
 > **Note:** If you have existing users created before v1.1.0, manually add the missing numeric fields (`followersCount`, `followingCount`, `bookmarksCount`, `chaptersRead`, `totalWorks`, `totalChaptersUploaded`) as `int64` with value `0` in Firestore Console.
 
+> **Note (v1.2.0):** If a user exists in Firebase Auth but has no Firestore document (e.g. accounts created before v1.0.0), the app will now automatically create their Firestore document on login. No manual action needed.
+
 ### 6. Flutter setup
 
 ```
@@ -217,6 +219,24 @@ APK will be at `build/app/outputs/flutter-apk/app-release.apk`
 | `http` | HTTP requests for Cloudinary |
 | `flutter_launcher_icons` | Custom app launcher icon |
 | `cupertino_icons` | iOS-style icons |
+
+---
+
+## Changelog
+
+### v1.2.0
+- Redesigned UI with vibrant coral, teal and gold theme
+- Fixed login failure for accounts missing a Firestore document
+- Auto-creates Firestore document on login if missing
+
+### v1.1.0
+- Added profile picture upload
+- Added reader and creator stats
+- Added follower/following count
+- Dark / Light theme toggle
+
+### v1.0.0
+- Initial release
 
 ---
 
