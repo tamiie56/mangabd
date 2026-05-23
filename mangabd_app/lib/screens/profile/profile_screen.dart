@@ -4,6 +4,9 @@ import '../../utils/auth_provider.dart';
 import '../../utils/theme_provider.dart';
 import '../../services/storage/storage_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'about_screen.dart';
+import 'notifications_screen.dart';
+import 'privacy_policy_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -159,8 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black
-                                        .withValues(alpha: 0.2),
+                                    color: Colors.black.withValues(alpha: 0.2),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
@@ -175,8 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: user.photoUrl.isEmpty
                                     ? Text(
                                         user.displayName.isNotEmpty
-                                            ? user.displayName[0]
-                                                .toUpperCase()
+                                            ? user.displayName[0].toUpperCase()
                                             : '?',
                                         style: const TextStyle(
                                           color: Colors.white,
@@ -215,8 +216,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFF00A844),
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: Colors.white, width: 2),
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
                               ),
                               child: const Icon(
                                 Icons.camera_alt,
@@ -246,9 +247,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 decoration: InputDecoration(
                                   isDense: true,
                                   filled: false,
-                                  contentPadding:
-                                      const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 6),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 6),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: const BorderSide(
@@ -261,8 +261,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide: const BorderSide(
-                                        color: Colors.white),
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
                                   ),
                                 ),
                               ),
@@ -285,8 +285,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const SizedBox(width: 4),
                               GestureDetector(
-                                onTap: () => setState(
-                                    () => _isEditingName = false),
+                                onTap: () =>
+                                    setState(() => _isEditingName = false),
                                 child: const Icon(Icons.close,
                                     color: Colors.white70, size: 22),
                               ),
@@ -455,7 +455,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: 'Notifications',
                     subtitle: 'Manage notification preferences',
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const NotificationsScreen()),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   _SettingsTile(
@@ -463,7 +467,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: 'Privacy Policy',
                     subtitle: 'View our privacy policy',
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const PrivacyPolicyScreen()),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   _SettingsTile(
@@ -471,7 +479,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: 'About',
                     subtitle: 'MangaBD v1.2.0',
                     trailing: const Icon(Icons.chevron_right),
-                    onTap: () {},
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const AboutScreen()),
+                    ),
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
