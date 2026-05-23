@@ -48,21 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? [
-                    const Color(0xFF0D1F12),
-                    const Color(0xFF132718),
-                    const Color(0xFF0D1F12),
-                  ]
-                : [
-                    const Color(0xFFF0FFF4),
-                    const Color(0xFFDCF5E4),
-                    const Color(0xFFF0FFF4),
-                  ],
-          ),
+          color: isDark ? const Color(0xFF0F1117) : const Color(0xFFF0FFF4),
         ),
         child: SafeArea(
           child: Center(
@@ -115,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Read · Create · Explore',
                     style: TextStyle(
                       color: isDark
-                          ? const Color(0xFF4A7A55)
+                          ? const Color(0xFF6B7280)
                           : const Color(0xFF9CA3AF),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -125,11 +111,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF132718) : Colors.white,
+                      color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                          color: Colors.black
+                              .withValues(alpha: isDark ? 0.3 : 0.08),
                           blurRadius: 24,
                           offset: const Offset(0, 8),
                         ),
@@ -159,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _obscurePassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
-                                color: const Color(0xFF4A7A55),
+                                color: const Color(0xFF6B7280),
                               ),
                               onPressed: () => setState(
                                   () => _obscurePassword = !_obscurePassword),
@@ -205,14 +192,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const SignupScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => const SignupScreen()),
                     ),
                     child: RichText(
                       text: TextSpan(
                         text: "Don't have an account? ",
                         style: TextStyle(
                           color: isDark
-                              ? const Color(0xFF4A7A55)
+                              ? const Color(0xFF6B7280)
                               : const Color(0xFF9CA3AF),
                           fontSize: 14,
                         ),

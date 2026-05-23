@@ -64,7 +64,7 @@ class AboutScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
-                'Version 1.2.0',
+                'Version 1.3.0',
                 style: TextStyle(
                   color: Color(0xFF00C853),
                   fontWeight: FontWeight.w700,
@@ -95,7 +95,7 @@ class AboutScreen extends StatelessWidget {
                 _InfoRow(
                   icon: Icons.tag_rounded,
                   label: 'Version',
-                  value: '1.2.0',
+                  value: '1.3.0',
                   isDark: isDark,
                 ),
                 _Divider(),

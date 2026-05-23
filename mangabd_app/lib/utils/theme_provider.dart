@@ -14,32 +14,32 @@ class ThemeProvider extends ChangeNotifier {
 
   static final _darkTheme = ThemeData(
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: const Color(0xFF0D1F12),
+    scaffoldBackgroundColor: const Color(0xFF0F1117),
     fontFamily: 'Nunito',
     colorScheme: ColorScheme.dark(
       primary: const Color(0xFF00C853),
-      secondary: const Color(0xFFFFD60A),
-      tertiary: const Color(0xFF00E676),
-      surface: const Color(0xFF132718),
+      secondary: const Color(0xFF00E676),
+      tertiary: const Color(0xFFFFD60A),
+      surface: const Color(0xFF1A1D2E),
       onPrimary: Colors.white,
-      onSecondary: const Color(0xFF1a1a1a),
-      onSurface: const Color(0xFFE8F5E9),
+      onSecondary: Colors.white,
+      onSurface: const Color(0xFFE8EAF6),
       error: const Color(0xFFFF4757),
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF132718),
+      backgroundColor: Color(0xFF1A1D2E),
       elevation: 0,
       centerTitle: false,
-      foregroundColor: Color(0xFFE8F5E9),
+      foregroundColor: Color(0xFFE8EAF6),
     ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: const Color(0xFF132718),
+      backgroundColor: const Color(0xFF1A1D2E),
       indicatorColor: const Color(0xFF00C853).withValues(alpha: 0.2),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: Color(0xFF00C853));
         }
-        return const IconThemeData(color: Color(0xFF4A7A55));
+        return const IconThemeData(color: Color(0xFF6B7280));
       }),
       labelTextStyle: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
@@ -50,20 +50,20 @@ class ThemeProvider extends ChangeNotifier {
           );
         }
         return const TextStyle(
-          color: Color(0xFF4A7A55),
+          color: Color(0xFF6B7280),
           fontWeight: FontWeight.w500,
           fontSize: 11,
         );
       }),
     ),
     cardTheme: CardThemeData(
-      color: const Color(0xFF132718),
+      color: const Color(0xFF1A1D2E),
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFF1A3320),
+      fillColor: const Color(0xFF252839),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
@@ -72,7 +72,7 @@ class ThemeProvider extends ChangeNotifier {
         borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: Color(0xFF00C853), width: 2),
       ),
-      hintStyle: const TextStyle(color: Color(0xFF4A7A55)),
+      hintStyle: const TextStyle(color: Color(0xFF6B7280)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
@@ -96,11 +96,11 @@ class ThemeProvider extends ChangeNotifier {
     fontFamily: 'Nunito',
     colorScheme: ColorScheme.light(
       primary: const Color(0xFF00C853),
-      secondary: const Color(0xFFFFD60A),
-      tertiary: const Color(0xFF00A844),
+      secondary: const Color(0xFF00A844),
+      tertiary: const Color(0xFF00E676),
       surface: Colors.white,
       onPrimary: Colors.white,
-      onSecondary: const Color(0xFF1a1a1a),
+      onSecondary: Colors.white,
       onSurface: const Color(0xFF0D1F12),
       error: const Color(0xFFFF4757),
     ),
