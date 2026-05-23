@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
+          color: isDark ? const Color(0xFF132718) : Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),

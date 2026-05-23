@@ -69,7 +69,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
           SliverAppBar(
             expandedHeight: 320,
             pinned: true,
-            backgroundColor: isDark ? const Color(0xFF1A1D2E) : Colors.white,
+            backgroundColor:
+                isDark ? const Color(0xFF132718) : Colors.white,
             leading: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
@@ -109,11 +110,15 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                 fit: StackFit.expand,
                 children: [
                   widget.manga.coverUrl.isNotEmpty
-                      ? Image.network(widget.manga.coverUrl, fit: BoxFit.cover)
+                      ? Image.network(widget.manga.coverUrl,
+                          fit: BoxFit.cover)
                       : Container(
                           decoration: const BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+                              colors: [
+                                Color(0xFF00C853),
+                                Color(0xFF00A844)
+                              ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -134,9 +139,9 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            (isDark
-                                ? const Color(0xFF0F1117)
-                                : const Color(0xFFFFF8F3)),
+                            isDark
+                                ? const Color(0xFF0D1F12)
+                                : const Color(0xFFF0FFF4),
                             Colors.transparent,
                           ],
                         ),
@@ -158,7 +163,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.w900,
-                      color: isDark ? Colors.white : const Color(0xFF1A1D2E),
+                      color: isDark ? Colors.white : const Color(0xFF0D1F12),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -168,13 +173,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF00D4AA).withValues(alpha: 0.15),
+                          color: const Color(0xFF00C853).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           'by ${widget.manga.creatorName}',
                           style: const TextStyle(
-                            color: Color(0xFF00D4AA),
+                            color: Color(0xFF00C853),
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -195,13 +200,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                     horizontal: 14, vertical: 8),
                                 decoration: BoxDecoration(
                                   color: _isFollowing
-                                      ? const Color(0xFFFF6B35)
+                                      ? const Color(0xFF00C853)
                                       : Colors.transparent,
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     color: _isFollowing
-                                        ? const Color(0xFFFF6B35)
-                                        : const Color(0xFF6B7280),
+                                        ? const Color(0xFF00C853)
+                                        : const Color(0xFF4A7A55),
                                   ),
                                 ),
                                 child: Row(
@@ -214,7 +219,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                       size: 16,
                                       color: _isFollowing
                                           ? Colors.white
-                                          : const Color(0xFF6B7280),
+                                          : const Color(0xFF4A7A55),
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
@@ -226,7 +231,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                         fontWeight: FontWeight.w600,
                                         color: _isFollowing
                                             ? Colors.white
-                                            : const Color(0xFF6B7280),
+                                            : const Color(0xFF4A7A55),
                                       ),
                                     ),
                                   ],
@@ -248,7 +253,10 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                               horizontal: 12, vertical: 5),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFFFF6B35), Color(0xFFFF8C42)],
+                              colors: [
+                                Color(0xFF00C853),
+                                Color(0xFF00A844)
+                              ],
                             ),
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -268,7 +276,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     widget.manga.description,
                     style: TextStyle(
                       color: isDark
-                          ? const Color(0xFF9CA3AF)
+                          ? const Color(0xFF4A7A55)
                           : const Color(0xFF6B7280),
                       fontSize: 14,
                       height: 1.6,
@@ -281,7 +289,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                         width: 4,
                         height: 20,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF6B35),
+                          color: const Color(0xFF00C853),
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -305,7 +313,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const SliverToBoxAdapter(
                   child: Center(
-                    child: CircularProgressIndicator(color: Color(0xFFFF6B35)),
+                    child: CircularProgressIndicator(
+                        color: Color(0xFF00C853)),
                   ),
                 );
               }
@@ -315,7 +324,7 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                     padding: EdgeInsets.all(16),
                     child: Text(
                       'No chapters yet.',
-                      style: TextStyle(color: Color(0xFF6B7280)),
+                      style: TextStyle(color: Color(0xFF4A7A55)),
                     ),
                   ),
                 );
@@ -342,13 +351,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? const Color(0xFF1A1D2E)
+                                ? const Color(0xFF132718)
                                 : Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black
-                                    .withValues(alpha: isDark ? 0.2 : 0.05),
+                                color: Colors.black.withValues(
+                                    alpha: isDark ? 0.2 : 0.05),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -362,8 +371,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                 decoration: BoxDecoration(
                                   gradient: const LinearGradient(
                                     colors: [
-                                      Color(0xFFFF6B35),
-                                      Color(0xFFFF8C42)
+                                      Color(0xFF00C853),
+                                      Color(0xFF00A844),
                                     ],
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
@@ -384,7 +393,8 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       'Chapter ${chapter.chapterNumber}: ${chapter.title}',
@@ -393,14 +403,14 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                         fontSize: 14,
                                         color: isDark
                                             ? Colors.white
-                                            : const Color(0xFF1A1D2E),
+                                            : const Color(0xFF0D1F12),
                                       ),
                                     ),
                                     const SizedBox(height: 3),
                                     Text(
                                       '${chapter.pageUrls.length} pages',
                                       style: const TextStyle(
-                                        color: Color(0xFF6B7280),
+                                        color: Color(0xFF4A7A55),
                                         fontSize: 12,
                                       ),
                                     ),
@@ -411,13 +421,13 @@ class _MangaDetailScreenState extends State<MangaDetailScreen> {
                                 width: 34,
                                 height: 34,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFF6B35)
+                                  color: const Color(0xFF00C853)
                                       .withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const Icon(
                                   Icons.play_arrow_rounded,
-                                  color: Color(0xFFFF6B35),
+                                  color: Color(0xFF00C853),
                                   size: 20,
                                 ),
                               ),

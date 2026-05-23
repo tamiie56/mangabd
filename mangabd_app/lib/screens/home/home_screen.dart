@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
         appBar: AppBar(
           title: ShaderMask(
             shaderCallback: (bounds) => const LinearGradient(
-              colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+              colors: [Color(0xFF00C853), Color(0xFF00E676)],
             ).createShader(bounds),
             child: const Text(
               'MangaBD',
@@ -43,13 +43,15 @@ class HomeScreen extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: isDark
-                        ? const Color(0xFF252839)
-                        : const Color(0xFFF3F4F6),
+                        ? const Color(0xFF1A3320)
+                        : const Color(0xFFE8F5E9),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                    color: isDark ? const Color(0xFFFFD60A) : const Color(0xFF6B7280),
+                    color: isDark
+                        ? const Color(0xFFFFD60A)
+                        : const Color(0xFF4A7A55),
                     size: 20,
                   ),
                 ),
@@ -57,11 +59,11 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
           bottom: TabBar(
-            indicatorColor: const Color(0xFFFF6B35),
+            indicatorColor: const Color(0xFF00C853),
             indicatorWeight: 3,
             indicatorSize: TabBarIndicatorSize.label,
-            labelColor: const Color(0xFFFF6B35),
-            unselectedLabelColor: const Color(0xFF6B7280),
+            labelColor: const Color(0xFF00C853),
+            unselectedLabelColor: const Color(0xFF4A7A55),
             labelStyle: const TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: 14,
@@ -95,7 +97,7 @@ class _ForYouTab extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFFF6B35)),
+            child: CircularProgressIndicator(color: Color(0xFF00C853)),
           );
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -122,7 +124,7 @@ class _FollowingTab extends StatelessWidget {
     if (userId.isEmpty) {
       return const Center(
         child: Text('Please login',
-            style: TextStyle(color: Color(0xFF6B7280))),
+            style: TextStyle(color: Color(0xFF4A7A55))),
       );
     }
 
@@ -131,7 +133,7 @@ class _FollowingTab extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: Color(0xFFFF6B35)),
+            child: CircularProgressIndicator(color: Color(0xFF00C853)),
           );
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -168,10 +170,10 @@ class _EmptyState extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: const Color(0xFFFF6B35).withValues(alpha: 0.1),
+              color: const Color(0xFF00C853).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(24),
             ),
-            child: Icon(icon, size: 40, color: const Color(0xFFFF6B35)),
+            child: Icon(icon, size: 40, color: const Color(0xFF00C853)),
           ),
           const SizedBox(height: 16),
           Text(
@@ -184,7 +186,7 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             subtitle,
-            style: const TextStyle(color: Color(0xFF6B7280), fontSize: 13),
+            style: const TextStyle(color: Color(0xFF4A7A55), fontSize: 13),
             textAlign: TextAlign.center,
           ),
         ],
@@ -230,7 +232,7 @@ class _MangaCard extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
+          color: isDark ? const Color(0xFF132718) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -255,7 +257,8 @@ class _MangaCard extends StatelessWidget {
                         ? Image.network(
                             manga.coverUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (ctx, err, st) => _CoverPlaceholder(),
+                            errorBuilder: (ctx, err, st) =>
+                                _CoverPlaceholder(),
                           )
                         : _CoverPlaceholder(),
                     Positioned(
@@ -280,9 +283,10 @@ class _MangaCard extends StatelessWidget {
                       bottom: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF6B35),
+                          color: const Color(0xFF00C853),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -306,7 +310,7 @@ class _MangaCard extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 13,
-                  color: isDark ? Colors.white : const Color(0xFF1A1D2E),
+                  color: isDark ? Colors.white : const Color(0xFF0D1F12),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -325,7 +329,7 @@ class _CoverPlaceholder extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+          colors: [Color(0xFF00C853), Color(0xFF00A844)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

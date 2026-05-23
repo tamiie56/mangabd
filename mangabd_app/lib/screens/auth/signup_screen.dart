@@ -73,14 +73,14 @@ class _SignupScreenState extends State<SignupScreen> {
             end: Alignment.bottomRight,
             colors: isDark
                 ? [
-                    const Color(0xFF0F1117),
-                    const Color(0xFF1A1D2E),
-                    const Color(0xFF0F1117),
+                    const Color(0xFF0D1F12),
+                    const Color(0xFF132718),
+                    const Color(0xFF0D1F12),
                   ]
                 : [
-                    const Color(0xFFFFF8F3),
-                    const Color(0xFFFFEDE4),
-                    const Color(0xFFFFF8F3),
+                    const Color(0xFFF0FFF4),
+                    const Color(0xFFDCF5E4),
+                    const Color(0xFFF0FFF4),
                   ],
           ),
         ),
@@ -94,7 +94,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        color: isDark ? Colors.white : const Color(0xFF1A1D2E),
+                        color: isDark ? Colors.white : const Color(0xFF0D1F12),
                       ),
                       onPressed: () => Navigator.pop(context),
                     ),
@@ -111,7 +111,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: [
                         ShaderMask(
                           shaderCallback: (bounds) => const LinearGradient(
-                            colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+                            colors: [Color(0xFF00C853), Color(0xFF00E676)],
                           ).createShader(bounds),
                           child: const Text(
                             'Join MangaBD',
@@ -127,7 +127,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           'Create your account today',
                           style: TextStyle(
                             color: isDark
-                                ? const Color(0xFF6B7280)
+                                ? const Color(0xFF4A7A55)
                                 : const Color(0xFF9CA3AF),
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -137,9 +137,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF1A1D2E)
-                                : Colors.white,
+                            color: isDark ? const Color(0xFF132718) : Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
@@ -159,7 +157,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   hintText: 'Display Name',
                                   prefixIcon: Icon(
                                       Icons.person_outline_rounded,
-                                      color: Color(0xFFFF6B35)),
+                                      color: Color(0xFF00C853)),
                                 ),
                               ),
                               const SizedBox(height: 14),
@@ -169,7 +167,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 decoration: const InputDecoration(
                                   hintText: 'Email address',
                                   prefixIcon: Icon(Icons.email_outlined,
-                                      color: Color(0xFFFF6B35)),
+                                      color: Color(0xFF00C853)),
                                 ),
                               ),
                               const SizedBox(height: 14),
@@ -179,13 +177,13 @@ class _SignupScreenState extends State<SignupScreen> {
                                 decoration: InputDecoration(
                                   hintText: 'Password',
                                   prefixIcon: const Icon(Icons.lock_outline,
-                                      color: Color(0xFFFF6B35)),
+                                      color: Color(0xFF00C853)),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: const Color(0xFF6B7280),
+                                      color: const Color(0xFF4A7A55),
                                     ),
                                     onPressed: () => setState(() =>
                                         _obscurePassword = !_obscurePassword),
@@ -198,16 +196,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                     horizontal: 16, vertical: 12),
                                 decoration: BoxDecoration(
                                   color: _isCreator
-                                      ? const Color(0xFFFF6B35)
-                                          .withValues(alpha: 0.1)
+                                      ? const Color(0xFF00C853).withValues(alpha: 0.1)
                                       : (isDark
-                                          ? const Color(0xFF252839)
-                                          : const Color(0xFFF3F4F6)),
+                                          ? const Color(0xFF1A3320)
+                                          : const Color(0xFFE8F5E9)),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
                                     color: _isCreator
-                                        ? const Color(0xFFFF6B35)
-                                            .withValues(alpha: 0.4)
+                                        ? const Color(0xFF00C853).withValues(alpha: 0.4)
                                         : Colors.transparent,
                                   ),
                                 ),
@@ -217,18 +213,16 @@ class _SignupScreenState extends State<SignupScreen> {
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
                                         color: _isCreator
-                                            ? const Color(0xFFFF6B35)
-                                            : const Color(0xFF6B7280)
-                                                .withValues(alpha: 0.2),
-                                        borderRadius:
-                                            BorderRadius.circular(10),
+                                            ? const Color(0xFF00C853)
+                                            : const Color(0xFF4A7A55).withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(
                                         Icons.draw_rounded,
                                         size: 18,
                                         color: _isCreator
                                             ? Colors.white
-                                            : const Color(0xFF6B7280),
+                                            : const Color(0xFF4A7A55),
                                       ),
                                     ),
                                     const SizedBox(width: 12),
@@ -244,7 +238,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                               fontSize: 14,
                                               color: isDark
                                                   ? Colors.white
-                                                  : const Color(0xFF1A1D2E),
+                                                  : const Color(0xFF0D1F12),
                                             ),
                                           ),
                                           Text(
@@ -252,7 +246,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                             style: TextStyle(
                                               fontSize: 11,
                                               color: isDark
-                                                  ? const Color(0xFF6B7280)
+                                                  ? const Color(0xFF4A7A55)
                                                   : const Color(0xFF9CA3AF),
                                             ),
                                           ),
@@ -261,10 +255,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ),
                                     Switch(
                                       value: _isCreator,
-                                      onChanged: (val) => setState(
-                                          () => _isCreator = val),
-                                      activeThumbColor:
-                                          const Color(0xFFFF6B35),
+                                      onChanged: (val) =>
+                                          setState(() => _isCreator = val),
+                                      activeThumbColor: const Color(0xFF00C853),
                                     ),
                                   ],
                                 ),
@@ -276,11 +269,10 @@ class _SignupScreenState extends State<SignupScreen> {
                                 child: ElevatedButton(
                                   onPressed: auth.isLoading ? null : _signup,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFF6B35),
+                                    backgroundColor: const Color(0xFF00C853),
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(14),
                                     ),
                                     elevation: 0,
                                   ),
@@ -313,7 +305,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               text: 'Already have an account? ',
                               style: TextStyle(
                                 color: isDark
-                                    ? const Color(0xFF6B7280)
+                                    ? const Color(0xFF4A7A55)
                                     : const Color(0xFF9CA3AF),
                                 fontSize: 14,
                               ),
@@ -321,7 +313,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 TextSpan(
                                   text: 'Login',
                                   style: TextStyle(
-                                    color: Color(0xFFFF6B35),
+                                    color: Color(0xFF00C853),
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),

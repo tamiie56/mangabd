@@ -52,27 +52,29 @@ class _SearchScreenState extends State<SearchScreen> {
         title: Container(
           height: 44,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF252839) : const Color(0xFFF3F4F6),
+            color: isDark
+                ? const Color(0xFF1A3320)
+                : const Color(0xFFE8F5E9),
             borderRadius: BorderRadius.circular(14),
           ),
           child: TextField(
             controller: _controller,
             onChanged: _onSearch,
             style: TextStyle(
-              color: isDark ? Colors.white : const Color(0xFF1A1D2E),
+              color: isDark ? Colors.white : const Color(0xFF0D1F12),
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
               hintText: 'Search manga...',
-              hintStyle: const TextStyle(color: Color(0xFF6B7280)),
+              hintStyle: const TextStyle(color: Color(0xFF4A7A55)),
               border: InputBorder.none,
               filled: false,
               prefixIcon: const Icon(Icons.search_rounded,
-                  color: Color(0xFFFF6B35), size: 22),
+                  color: Color(0xFF00C853), size: 22),
               suffixIcon: _controller.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.close_rounded,
-                          color: Color(0xFF6B7280), size: 20),
+                          color: Color(0xFF4A7A55), size: 20),
                       onPressed: () {
                         _controller.clear();
                         _onSearch('');
@@ -86,7 +88,7 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: _isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFFFF6B35)),
+              child: CircularProgressIndicator(color: Color(0xFF00C853)),
             )
           : !_hasSearched
               ? _buildSearchPrompt()
@@ -107,14 +109,14 @@ class _SearchScreenState extends State<SearchScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  const Color(0xFFFF6B35).withValues(alpha: 0.2),
-                  const Color(0xFF00D4AA).withValues(alpha: 0.2),
+                  const Color(0xFF00C853).withValues(alpha: 0.2),
+                  const Color(0xFF00E676).withValues(alpha: 0.2),
                 ],
               ),
               borderRadius: BorderRadius.circular(24),
             ),
             child: const Icon(Icons.search_rounded,
-                size: 40, color: Color(0xFFFF6B35)),
+                size: 40, color: Color(0xFF00C853)),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -124,7 +126,7 @@ class _SearchScreenState extends State<SearchScreen> {
           const SizedBox(height: 6),
           const Text(
             'Type a title to get started',
-            style: TextStyle(color: Color(0xFF6B7280), fontSize: 13),
+            style: TextStyle(color: Color(0xFF4A7A55), fontSize: 13),
           ),
         ],
       ),
@@ -140,11 +142,11 @@ class _SearchScreenState extends State<SearchScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: const Color(0xFF6B7280).withValues(alpha: 0.1),
+              color: const Color(0xFF4A7A55).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(24),
             ),
             child: const Icon(Icons.search_off_rounded,
-                size: 40, color: Color(0xFF6B7280)),
+                size: 40, color: Color(0xFF4A7A55)),
           ),
           const SizedBox(height: 16),
           const Text(
@@ -154,7 +156,7 @@ class _SearchScreenState extends State<SearchScreen> {
           const SizedBox(height: 6),
           const Text(
             'Try a different search term',
-            style: TextStyle(color: Color(0xFF6B7280), fontSize: 13),
+            style: TextStyle(color: Color(0xFF4A7A55), fontSize: 13),
           ),
         ],
       ),
@@ -181,12 +183,12 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
+              color: isDark ? const Color(0xFF132718) : Colors.white,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color:
-                      Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
+                  color: Colors.black
+                      .withValues(alpha: isDark ? 0.3 : 0.08),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -218,7 +220,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF6B35),
+                              color: const Color(0xFF00C853),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -242,7 +244,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 13,
-                      color: isDark ? Colors.white : const Color(0xFF1A1D2E),
+                      color: isDark
+                          ? Colors.white
+                          : const Color(0xFF0D1F12),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -260,7 +264,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+          colors: [Color(0xFF00C853), Color(0xFF00A844)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

@@ -48,7 +48,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Failed to upload photo'),
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: const Color(0xFFFF4757),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -73,8 +76,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(success ? 'Name updated' : 'Failed to update name'),
-          backgroundColor:
-              success ? Colors.green.shade700 : Colors.red.shade700,
+          backgroundColor: success
+              ? const Color(0xFF00C853)
+              : const Color(0xFFFF4757),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12)),
         ),
       );
     }
@@ -84,19 +91,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Logout'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Logout',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         content: const Text('Are you sure you want to logout?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: const Text('Cancel',
+                style: TextStyle(color: Color(0xFF4A7A55))),
           ),
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
               await auth.signOut();
             },
-            child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            child: const Text('Logout',
+                style: TextStyle(
+                    color: Color(0xFFFF4757), fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -109,24 +121,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = context.watch<ThemeProvider>();
     final user = auth.user!;
     final isDark = theme.isDark;
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 220,
             pinned: true,
             automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      colorScheme.primary.withValues(alpha: 0.8),
-                      colorScheme.secondary.withValues(alpha: 0.6),
+                      Color(0xFF00C853),
+                      Color(0xFF00A844),
                     ],
                   ),
                 ),
@@ -146,18 +157,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: Colors.white,
                                   width: 3,
                                 ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black
+                                        .withValues(alpha: 0.2),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                               ),
                               child: CircleAvatar(
                                 radius: 44,
-                                backgroundColor:
-                                    colorScheme.primary.withValues(alpha: 0.3),
+                                backgroundColor: const Color(0xFF00A844),
                                 backgroundImage: user.photoUrl.isNotEmpty
                                     ? NetworkImage(user.photoUrl)
                                     : null,
                                 child: user.photoUrl.isEmpty
                                     ? Text(
                                         user.displayName.isNotEmpty
-                                            ? user.displayName[0].toUpperCase()
+                                            ? user.displayName[0]
+                                                .toUpperCase()
                                             : '?',
                                         style: const TextStyle(
                                           color: Colors.white,
@@ -194,10 +213,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: colorScheme.primary,
+                                color: const Color(0xFF00A844),
                                 shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.white, width: 2),
+                                border: Border.all(
+                                    color: Colors.white, width: 2),
                               ),
                               child: const Icon(
                                 Icons.camera_alt,
@@ -226,8 +245,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 6),
+                                  filled: false,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 6),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
                                     borderSide: const BorderSide(
@@ -240,8 +261,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
+                                    borderSide: const BorderSide(
+                                        color: Colors.white),
                                   ),
                                 ),
                               ),
@@ -260,14 +281,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               GestureDetector(
                                 onTap: () => _saveName(auth),
                                 child: const Icon(Icons.check,
-                                    color: Colors.greenAccent, size: 22),
+                                    color: Colors.white, size: 22),
                               ),
                               const SizedBox(width: 4),
                               GestureDetector(
-                                onTap: () =>
-                                    setState(() => _isEditingName = false),
+                                onTap: () => setState(
+                                    () => _isEditingName = false),
                                 child: const Icon(Icons.close,
-                                    color: Colors.redAccent, size: 22),
+                                    color: Colors.white70, size: 22),
                               ),
                             ],
                           ] else ...[
@@ -324,7 +345,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            title: const Text('Profile'),
+            title: const Text('Profile',
+                style: TextStyle(fontWeight: FontWeight.w800)),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -332,7 +354,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SectionLabel(label: 'Social', icon: Icons.people_outline),
+                  const _SectionLabel(
+                      label: 'Social', icon: Icons.people_outline),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -341,7 +364,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           value: user.followersCount.toString(),
                           label: 'Followers',
                           icon: Icons.person_add_outlined,
-                          color: colorScheme.primary,
+                          color: const Color(0xFF00C853),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -350,14 +373,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           value: user.followingCount.toString(),
                           label: 'Following',
                           icon: Icons.person_outlined,
-                          color: colorScheme.secondary,
+                          color: const Color(0xFF00A844),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  _SectionLabel(
-                      label: 'Reader Stats', icon: Icons.menu_book_outlined),
+                  const _SectionLabel(
+                      label: 'Reader Stats',
+                      icon: Icons.menu_book_outlined),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -366,7 +390,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           value: user.chaptersRead.toString(),
                           label: 'Chapters Read',
                           icon: Icons.auto_stories_outlined,
-                          color: Colors.teal,
+                          color: const Color(0xFF00BCD4),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -375,14 +399,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           value: user.bookmarksCount.toString(),
                           label: 'Bookmarks',
                           icon: Icons.bookmark_outline,
-                          color: Colors.amber,
+                          color: const Color(0xFFFFD60A),
                         ),
                       ),
                     ],
                   ),
                   if (user.isCreator) ...[
                     const SizedBox(height: 20),
-                    _SectionLabel(
+                    const _SectionLabel(
                         label: 'Creator Stats',
                         icon: Icons.dashboard_outlined),
                     const SizedBox(height: 10),
@@ -393,7 +417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             value: user.totalWorks.toString(),
                             label: 'Total Works',
                             icon: Icons.collections_bookmark_outlined,
-                            color: Colors.deepPurpleAccent,
+                            color: const Color(0xFF00E676),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -402,15 +426,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             value: user.totalChaptersUploaded.toString(),
                             label: 'Chapters Uploaded',
                             icon: Icons.upload_outlined,
-                            color: Colors.indigo,
+                            color: const Color(0xFF69F0AE),
                           ),
                         ),
                       ],
                     ),
                   ],
                   const SizedBox(height: 24),
-                  _SectionLabel(
-                      label: 'App Settings', icon: Icons.settings_outlined),
+                  const _SectionLabel(
+                      label: 'App Settings',
+                      icon: Icons.settings_outlined),
                   const SizedBox(height: 10),
                   _SettingsTile(
                     icon: isDark
@@ -421,7 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     trailing: Switch(
                       value: isDark,
                       onChanged: (_) => theme.toggleTheme(),
-                      activeThumbColor: colorScheme.primary,
+                      activeThumbColor: const Color(0xFF00C853),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -444,7 +469,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _SettingsTile(
                     icon: Icons.info_outline,
                     title: 'About',
-                    subtitle: 'MangaBD v1.0.0',
+                    subtitle: 'MangaBD v1.2.0',
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {},
                   ),
@@ -456,18 +481,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () => _showLogoutDialog(auth),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                            color: Colors.red.withValues(alpha: 0.6)),
+                            color: const Color(0xFFFF4757)
+                                .withValues(alpha: 0.6)),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      icon: const Icon(Icons.logout, color: Colors.red),
+                      icon: const Icon(Icons.logout,
+                          color: Color(0xFFFF4757)),
                       label: const Text(
                         'Logout',
                         style: TextStyle(
-                          color: Colors.red,
+                          color: Color(0xFFFF4757),
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
@@ -491,17 +518,16 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(icon, size: 18, color: colorScheme.primary),
+        Icon(icon, size: 18, color: const Color(0xFF00C853)),
         const SizedBox(width: 6),
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: colorScheme.primary,
+            color: Color(0xFF00C853),
             letterSpacing: 0.5,
           ),
         ),
@@ -590,7 +616,6 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final colorScheme = Theme.of(context).colorScheme;
     return Material(
       color: isDark
           ? Colors.white.withValues(alpha: 0.05)
@@ -606,10 +631,10 @@ class _SettingsTile extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.1),
+                  color: const Color(0xFF00C853).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(icon, size: 20, color: colorScheme.primary),
+                child: Icon(icon, size: 20, color: const Color(0xFF00C853)),
               ),
               const SizedBox(width: 12),
               Expanded(

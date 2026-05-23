@@ -16,7 +16,7 @@ class BookmarksScreen extends StatelessWidget {
       return const Scaffold(
         body: Center(
           child: Text('Please login',
-              style: TextStyle(color: Color(0xFF6B7280))),
+              style: TextStyle(color: Color(0xFF4A7A55))),
         ),
       );
     }
@@ -32,7 +32,8 @@ class BookmarksScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFD60A).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
@@ -62,7 +63,8 @@ class BookmarksScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFFFF6B35)),
+              child:
+                  CircularProgressIndicator(color: Color(0xFF00C853)),
             );
           }
           final bookmarks = snapshot.data ?? [];
@@ -84,14 +86,14 @@ class BookmarksScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text(
                     'No bookmarks yet.',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 6),
                   const Text(
                     'Bookmark manga to read them later.',
                     style:
-                        TextStyle(color: Color(0xFF6B7280), fontSize: 13),
+                        TextStyle(color: Color(0xFF4A7A55), fontSize: 13),
                   ),
                 ],
               ),
@@ -129,8 +131,9 @@ class BookmarksScreen extends StatelessWidget {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color:
-                        isDark ? const Color(0xFF1A1D2E) : Colors.white,
+                    color: isDark
+                        ? const Color(0xFF132718)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
@@ -167,7 +170,8 @@ class BookmarksScreen extends StatelessWidget {
                                   padding: const EdgeInsets.all(5),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFFFD60A),
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius:
+                                        BorderRadius.circular(8),
                                   ),
                                   child: const Icon(
                                     Icons.bookmark_rounded,
@@ -181,7 +185,8 @@ class BookmarksScreen extends StatelessWidget {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                        padding:
+                            const EdgeInsets.fromLTRB(10, 10, 10, 10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -192,7 +197,7 @@ class BookmarksScreen extends StatelessWidget {
                                 fontSize: 13,
                                 color: isDark
                                     ? Colors.white
-                                    : const Color(0xFF1A1D2E),
+                                    : const Color(0xFF0D1F12),
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -201,7 +206,7 @@ class BookmarksScreen extends StatelessWidget {
                             Text(
                               '${b['totalChapters'] ?? 0} chapters',
                               style: const TextStyle(
-                                  color: Color(0xFF6B7280), fontSize: 11),
+                                  color: Color(0xFF4A7A55), fontSize: 11),
                             ),
                           ],
                         ),
@@ -221,7 +226,7 @@ class BookmarksScreen extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+          colors: [Color(0xFF00C853), Color(0xFF00A844)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

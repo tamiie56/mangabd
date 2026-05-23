@@ -53,14 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
             end: Alignment.bottomRight,
             colors: isDark
                 ? [
-                    const Color(0xFF0F1117),
-                    const Color(0xFF1A1D2E),
-                    const Color(0xFF0F1117),
+                    const Color(0xFF0D1F12),
+                    const Color(0xFF132718),
+                    const Color(0xFF0D1F12),
                   ]
                 : [
-                    const Color(0xFFFFF8F3),
-                    const Color(0xFFFFEDE4),
-                    const Color(0xFFFFF8F3),
+                    const Color(0xFFF0FFF4),
+                    const Color(0xFFDCF5E4),
+                    const Color(0xFFF0FFF4),
                   ],
           ),
         ),
@@ -76,14 +76,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 90,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFFF6B35), Color(0xFFFF8C42)],
+                        colors: [Color(0xFF00C853), Color(0xFF00A844)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFF6B35).withValues(alpha: 0.4),
+                          color: const Color(0xFF00C853).withValues(alpha: 0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   ShaderMask(
                     shaderCallback: (bounds) => const LinearGradient(
-                      colors: [Color(0xFFFF6B35), Color(0xFF00D4AA)],
+                      colors: [Color(0xFF00C853), Color(0xFF00E676)],
                     ).createShader(bounds),
                     child: const Text(
                       'MangaBD',
@@ -112,10 +112,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Read & Create Comics',
+                    'Read · Create · Explore',
                     style: TextStyle(
                       color: isDark
-                          ? const Color(0xFF6B7280)
+                          ? const Color(0xFF4A7A55)
                           : const Color(0xFF9CA3AF),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1A1D2E) : Colors.white,
+                      color: isDark ? const Color(0xFF132718) : Colors.white,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: const InputDecoration(
                             hintText: 'Email address',
                             prefixIcon: Icon(Icons.email_outlined,
-                                color: Color(0xFFFF6B35)),
+                                color: Color(0xFF00C853)),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -153,13 +153,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             hintText: 'Password',
                             prefixIcon: const Icon(Icons.lock_outline,
-                                color: Color(0xFFFF6B35)),
+                                color: Color(0xFF00C853)),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
-                                color: const Color(0xFF6B7280),
+                                color: const Color(0xFF4A7A55),
                               ),
                               onPressed: () => setState(
                                   () => _obscurePassword = !_obscurePassword),
@@ -173,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: auth.isLoading ? null : _login,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFF6B35),
+                              backgroundColor: const Color(0xFF00C853),
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
@@ -205,15 +205,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (_) => const SignupScreen()),
+                      MaterialPageRoute(builder: (_) => const SignupScreen()),
                     ),
                     child: RichText(
                       text: TextSpan(
                         text: "Don't have an account? ",
                         style: TextStyle(
                           color: isDark
-                              ? const Color(0xFF6B7280)
+                              ? const Color(0xFF4A7A55)
                               : const Color(0xFF9CA3AF),
                           fontSize: 14,
                         ),
@@ -221,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextSpan(
                             text: 'Sign up',
                             style: TextStyle(
-                              color: Color(0xFFFF6B35),
+                              color: Color(0xFF00C853),
                               fontWeight: FontWeight.w700,
                             ),
                           ),

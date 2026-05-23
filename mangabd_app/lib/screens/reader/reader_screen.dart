@@ -71,7 +71,7 @@ class _ReaderScreenState extends State<ReaderScreen>
                 ? const Center(
                     child: Text(
                       'No pages available',
-                      style: TextStyle(color: Color(0xFF6B7280)),
+                      style: TextStyle(color: Color(0xFF4A7A55)),
                     ),
                   )
                 : ListView.builder(
@@ -85,7 +85,7 @@ class _ReaderScreenState extends State<ReaderScreen>
                           if (loadingProgress == null) return child;
                           return Container(
                             height: 400,
-                            color: const Color(0xFF0F1117),
+                            color: const Color(0xFF0D1F12),
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -94,7 +94,7 @@ class _ReaderScreenState extends State<ReaderScreen>
                                     width: 40,
                                     height: 40,
                                     child: CircularProgressIndicator(
-                                      color: const Color(0xFFFF6B35),
+                                      color: const Color(0xFF00C853),
                                       strokeWidth: 3,
                                       value: loadingProgress
                                                   .expectedTotalBytes !=
@@ -110,7 +110,7 @@ class _ReaderScreenState extends State<ReaderScreen>
                                   Text(
                                     'Page ${index + 1}',
                                     style: const TextStyle(
-                                      color: Color(0xFF6B7280),
+                                      color: Color(0xFF4A7A55),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -121,10 +121,10 @@ class _ReaderScreenState extends State<ReaderScreen>
                         },
                         errorBuilder: (ctx, err, st) => Container(
                           height: 200,
-                          color: const Color(0xFF1A1D2E),
+                          color: const Color(0xFF132718),
                           child: const Center(
                             child: Icon(Icons.broken_image_rounded,
-                                color: Color(0xFF6B7280), size: 48),
+                                color: Color(0xFF4A7A55), size: 48),
                           ),
                         ),
                       );
@@ -185,7 +185,7 @@ class _ReaderScreenState extends State<ReaderScreen>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFF6B35)
+                                  color: const Color(0xFF00C853)
                                       .withValues(alpha: 0.8),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
