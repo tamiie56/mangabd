@@ -35,12 +35,12 @@ class UserModel {
       photoUrl: map['photoUrl'] ?? '',
       isCreator: map['isCreator'] ?? false,
       createdAt: DateTime.parse(map['createdAt']),
-      followersCount: map['followersCount'] ?? 0,
-      followingCount: map['followingCount'] ?? 0,
-      bookmarksCount: map['bookmarksCount'] ?? 0,
-      chaptersRead: map['chaptersRead'] ?? 0,
-      totalWorks: map['totalWorks'] ?? 0,
-      totalChaptersUploaded: map['totalChaptersUploaded'] ?? 0,
+      followersCount: (map['followersCount'] ?? 0).toInt(),
+      followingCount: (map['followingCount'] ?? 0).toInt(),
+      bookmarksCount: (map['bookmarksCount'] ?? 0).toInt(),
+      chaptersRead: (map['chaptersRead'] ?? 0).toInt(),
+      totalWorks: (map['totalWorks'] ?? 0).toInt(),
+      totalChaptersUploaded: (map['totalChaptersUploaded'] ?? 0).toInt(),
     );
   }
 

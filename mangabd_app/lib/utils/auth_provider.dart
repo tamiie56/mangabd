@@ -9,11 +9,13 @@ class AuthProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   UserModel? _user;
   bool _isLoading = false;
+  String? _lastError;
 
   UserModel? get user => _user;
   bool get isLoading => _isLoading;
   bool get isLoggedIn => _user != null;
   bool get isCreator => _user?.isCreator ?? false;
+  String? get lastError => _lastError;
 
   AuthProvider() {
     _init();
@@ -65,10 +67,14 @@ class AuthProvider extends ChangeNotifier {
     required String password,
   }) async {
     _setLoading(true);
+    _lastError = null;
     final user = await _authService.signIn(
       email: email,
       password: password,
     );
+    if (user == null) {
+      _lastError = _authService.lastSignInError;
+    }
     _user = user;
     _setLoading(false);
     return user != null;
@@ -85,8 +91,7 @@ class AuthProvider extends ChangeNotifier {
     try {
       await _firestoreService.updateUserProfile(
           _user!.uid, {'displayName': newName});
-      await FirebaseAuth.instance.currentUser
-          ?.updateDisplayName(newName);
+      await FirebaseAuth.instance.currentUser?.updateDisplayName(newName);
       _user = _user!.copyWith(displayName: newName);
       notifyListeners();
       return true;
@@ -111,8 +116,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> refreshUser() async {
     if (_user == null) return;
-    final updated =
-        await _firestoreService.getUserById(_user!.uid);
+    final updated = await _firestoreService.getUserById(_user!.uid);
     if (updated != null) {
       _user = updated;
       notifyListeners();

@@ -6,6 +6,8 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  String? lastSignInError;
+
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   User? get currentUser => _auth.currentUser;
@@ -44,6 +46,7 @@ class AuthService {
     required String password,
   }) async {
     try {
+      lastSignInError = null;
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -70,7 +73,11 @@ class AuthService {
           .doc(firebaseUser.uid)
           .set(userModel.toMap());
       return userModel;
+    } on FirebaseAuthException catch (e) {
+      lastSignInError = 'Auth error: ${e.code} — ${e.message}';
+      return null;
     } catch (e) {
+      lastSignInError = 'Error: $e';
       return null;
     }
   }

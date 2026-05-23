@@ -29,9 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
       password: _passwordController.text.trim(),
     );
     if (!success && mounted) {
+      final lastError = auth.lastError ?? 'Login failed. Check your credentials.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Login failed. Check your credentials.'),
+          content: Text(lastError),
           backgroundColor: const Color(0xFFFF4757),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
