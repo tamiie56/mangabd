@@ -5,6 +5,7 @@ import '../../utils/theme_provider.dart';
 import '../../models/manga_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../home/manga_detail_screen.dart';
+import '../chat/chat_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,8 +13,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    final themeProvider = context.watch<ThemeProvider>();
-    final isDark = themeProvider.isDark;
+    final isDark = context.watch<ThemeProvider>().isDark;
 
     return DefaultTabController(
       length: 2,
@@ -36,25 +36,59 @@ class HomeScreen extends StatelessWidget {
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 12),
-              child: GestureDetector(
-                onTap: () => themeProvider.toggleTheme(),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF1A3320)
-                        : const Color(0xFFE8F5E9),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    isDark ? Icons.wb_sunny_rounded : Icons.dark_mode_rounded,
-                    color: isDark
-                        ? const Color(0xFFFFD60A)
-                        : const Color(0xFF4A7A55),
-                    size: 20,
-                  ),
-                ),
+              child: StreamBuilder<int>(
+                stream: FirestoreService().getTotalUnreadCount(auth.user?.uid ?? ''),
+                builder: (context, snapshot) {
+                  final unread = snapshot.data ?? 0;
+                  return GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ChatListScreen()),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF1A3320)
+                                : const Color(0xFFE8F5E9),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(
+                            Icons.chat_bubble_outline_rounded,
+                            color: Color(0xFF00C853),
+                            size: 20,
+                          ),
+                        ),
+                        if (unread > 0)
+                          Positioned(
+                            right: -4,
+                            top: -4,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFF4757),
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                              child: Text(
+                                unread > 99 ? '99+' : '$unread',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -123,8 +157,7 @@ class _FollowingTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (userId.isEmpty) {
       return const Center(
-        child: Text('Please login',
-            style: TextStyle(color: Color(0xFF4A7A55))),
+        child: Text('Please login', style: TextStyle(color: Color(0xFF4A7A55))),
       );
     }
 
@@ -257,8 +290,7 @@ class _MangaCard extends StatelessWidget {
                         ? Image.network(
                             manga.coverUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (ctx, err, st) =>
-                                _CoverPlaceholder(),
+                            errorBuilder: (ctx, err, st) => _CoverPlaceholder(),
                           )
                         : _CoverPlaceholder(),
                     Positioned(
@@ -283,8 +315,7 @@ class _MangaCard extends StatelessWidget {
                       bottom: 8,
                       left: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: const Color(0xFF00C853),
                           borderRadius: BorderRadius.circular(8),

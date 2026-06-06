@@ -477,7 +477,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _SettingsTile(
                     icon: Icons.info_outline,
                     title: 'About',
-                    subtitle: 'MangaBD v1.3.0',
+                    subtitle: 'MangaBD v1.4.0',
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () => Navigator.push(
                       context,

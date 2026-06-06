@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/manga_model.dart';
 import '../../models/chapter_model.dart';
 import '../../models/user_model.dart';
+import '../../models/chat_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -294,5 +295,137 @@ class FirestoreService {
         .snapshots()
         .where((doc) => doc.exists)
         .map((doc) => UserModel.fromMap(doc.data()!));
+  }
+
+  Future<List<UserModel>> getAllUsers(String currentUserId) async {
+    final snap = await _firestore.collection('users').get();
+    return snap.docs
+        .map((doc) => UserModel.fromMap(doc.data()))
+        .where((user) => user.uid != currentUserId)
+        .toList();
+  }
+
+  String _conversationId(String uid1, String uid2) {
+    final sorted = [uid1, uid2]..sort();
+    return '${sorted[0]}_${sorted[1]}';
+  }
+
+  Future<ConversationModel> getOrCreateConversation({
+    required String currentUserId,
+    required String currentUserName,
+    required String currentUserPhoto,
+    required String otherUserId,
+    required String otherUserName,
+    required String otherUserPhoto,
+  }) async {
+    final convId = _conversationId(currentUserId, otherUserId);
+    final ref = _firestore.collection('conversations').doc(convId);
+    final doc = await ref.get();
+
+    if (doc.exists) {
+      return ConversationModel.fromMap(doc.data()!);
+    }
+
+    final conversation = ConversationModel(
+      id: convId,
+      participantIds: [currentUserId, otherUserId],
+      participantNames: {
+        currentUserId: currentUserName,
+        otherUserId: otherUserName,
+      },
+      participantPhotos: {
+        currentUserId: currentUserPhoto,
+        otherUserId: otherUserPhoto,
+      },
+      lastMessage: '',
+      lastSenderId: '',
+      lastMessageAt: DateTime.now(),
+      unreadCount: {
+        currentUserId: 0,
+        otherUserId: 0,
+      },
+    );
+
+    await ref.set(conversation.toMap());
+    return conversation;
+  }
+
+  Stream<List<ConversationModel>> getConversations(String userId) {
+    return _firestore
+        .collection('conversations')
+        .where('participantIds', arrayContains: userId)
+        .orderBy('lastMessageAt', descending: true)
+        .snapshots()
+        .map((snap) => snap.docs
+            .map((doc) => ConversationModel.fromMap(doc.data()))
+            .toList());
+  }
+
+  Stream<List<MessageModel>> getMessages(String conversationId) {
+    return _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .orderBy('createdAt', descending: false)
+        .snapshots()
+        .map((snap) => snap.docs
+            .map((doc) => MessageModel.fromMap(doc.data()))
+            .toList());
+  }
+
+  Future<void> sendMessage({
+    required String conversationId,
+    required String senderId,
+    required String senderName,
+    required String text,
+    required String otherUserId,
+  }) async {
+    final messageId = DateTime.now().millisecondsSinceEpoch.toString();
+    final message = MessageModel(
+      id: messageId,
+      senderId: senderId,
+      senderName: senderName,
+      text: text,
+      createdAt: DateTime.now(),
+    );
+
+    await _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .doc(messageId)
+        .set(message.toMap());
+
+    await _firestore.collection('conversations').doc(conversationId).update({
+      'lastMessage': text,
+      'lastSenderId': senderId,
+      'lastMessageAt': DateTime.now().toIso8601String(),
+      'unreadCount.$otherUserId': FieldValue.increment(1),
+    });
+  }
+
+  Future<void> markMessagesAsRead({
+    required String conversationId,
+    required String userId,
+  }) async {
+    await _firestore.collection('conversations').doc(conversationId).update({
+      'unreadCount.$userId': 0,
+    });
+  }
+
+  Stream<int> getTotalUnreadCount(String userId) {
+    return _firestore
+        .collection('conversations')
+        .where('participantIds', arrayContains: userId)
+        .snapshots()
+        .map((snap) {
+      int total = 0;
+      for (final doc in snap.docs) {
+        final data = doc.data();
+        final unread = data['unreadCount'] as Map<String, dynamic>? ?? {};
+        total += (unread[userId] as num? ?? 0).toInt();
+      }
+      return total;
+    });
   }
 }

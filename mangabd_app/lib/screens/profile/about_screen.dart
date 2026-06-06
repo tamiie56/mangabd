@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
+
+  Future<void> _openGitHub() async {
+    final uri = Uri.parse('https://github.com/tamiie56');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +72,7 @@ class AboutScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
-                'Version 1.3.0',
+                'Version 1.4.0',
                 style: TextStyle(
                   color: Color(0xFF00C853),
                   fontWeight: FontWeight.w700,
@@ -76,7 +84,9 @@ class AboutScreen extends StatelessWidget {
             Text(
               'Read · Create · Explore',
               style: TextStyle(
-                color: isDark ? const Color(0xFF4A7A55) : const Color(0xFF9CA3AF),
+                color: isDark
+                    ? const Color(0xFF4A7A55)
+                    : const Color(0xFF9CA3AF),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
@@ -95,7 +105,7 @@ class AboutScreen extends StatelessWidget {
                 _InfoRow(
                   icon: Icons.tag_rounded,
                   label: 'Version',
-                  value: '1.3.0',
+                  value: '1.4.0',
                   isDark: isDark,
                 ),
                 _Divider(),
@@ -118,11 +128,54 @@ class AboutScreen extends StatelessWidget {
             _InfoCard(
               isDark: isDark,
               children: [
-                _InfoRow(
-                  icon: Icons.person_outline_rounded,
-                  label: 'Developer',
-                  value: 'tamiie56',
-                  isDark: isDark,
+                GestureDetector(
+                  onTap: _openGitHub,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00C853).withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.person_outline_rounded,
+                              size: 18, color: Color(0xFF00C853)),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Developer',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDark
+                                ? const Color(0xFF4A7A55)
+                                : const Color(0xFF9CA3AF),
+                          ),
+                        ),
+                        const Spacer(),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'tamiie56',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF00C853),
+                                decoration: TextDecoration.underline,
+                                decorationColor: const Color(0xFF00C853),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.open_in_new_rounded,
+                                size: 14, color: Color(0xFF00C853)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 _Divider(),
                 _InfoRow(
@@ -235,7 +288,9 @@ class _InfoRow extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 14,
-              color: isDark ? const Color(0xFF4A7A55) : const Color(0xFF9CA3AF),
+              color: isDark
+                  ? const Color(0xFF4A7A55)
+                  : const Color(0xFF9CA3AF),
             ),
           ),
           const Spacer(),
