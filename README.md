@@ -45,7 +45,10 @@ mangabd/
 │   │   │   │   ├── edit_manga_screen.dart
 │   │   │   │   └── add_chapter_screen.dart
 │   │   │   └── profile/
-│   │   │       └── profile_screen.dart
+│   │   │       ├── profile_screen.dart
+│   │   │       ├── about_screen.dart
+│   │   │       ├── notifications_screen.dart
+│   │   │       └── privacy_policy_screen.dart
 │   │   ├── utils/
 │   │   │   ├── auth_provider.dart
 │   │   │   └── theme_provider.dart
@@ -84,6 +87,9 @@ mangabd/
 | Edit Profile Username | ✅ Done |
 | Profile Picture Upload | ✅ Done |
 | Dark / Light Theme Toggle | ✅ Done |
+| About Screen | ✅ Done |
+| Notifications Settings | ✅ Done |
+| Privacy Policy Screen | ✅ Done |
 | Android APK Build | ✅ Done |
 
 ---
@@ -183,13 +189,26 @@ totalWorks, totalChaptersUploaded
 
 > **Note (v1.2.0):** If a user exists in Firebase Auth but has no Firestore document (e.g. accounts created before v1.0.0), the app will now automatically create their Firestore document on login. No manual action needed.
 
-### 6. Flutter setup
+> **Note (v1.4.0):** Fixed a crash on Android where Firestore returned numeric fields as `double` instead of `int`. If users had login issues on Android, this is now resolved.
+
+### 6. Android SHA-1 Setup
+
+To enable Firebase Authentication on Android builds, add your debug SHA-1 fingerprint to Firebase:
+
+```
+cd android
+.\gradlew signingReport
+```
+
+Copy the SHA1 value and add it in Firebase Console → Project Settings → Your Apps → Android app → Add fingerprint. Then download the updated `google-services.json` and replace it in `android/app/`.
+
+### 7. Flutter setup
 
 ```
 flutter pub get
 ```
 
-### 7. Run the app
+### 8. Run the app
 
 ```
 flutter run
@@ -217,12 +236,30 @@ APK will be at `build/app/outputs/flutter-apk/app-release.apk`
 | `provider` | State management |
 | `image_picker` | Pick images from gallery |
 | `http` | HTTP requests for Cloudinary |
+| `shared_preferences` | Local notification preferences |
+| `url_launcher` | Open external links in browser |
 | `flutter_launcher_icons` | Custom app launcher icon |
 | `cupertino_icons` | iOS-style icons |
 
 ---
 
 ## Changelog
+
+### v1.4.0
+- Fixed Android login crash caused by Firestore returning double instead of int
+- Fixed Android authentication by adding SHA-1 fingerprint to Firebase
+- Improved login error messages — now shows actual Firebase error reason
+- Added GitHub profile link in About screen for developer
+
+### v1.3.0
+- Redesigned app with green (#00C853) theme matching new logo
+- New speech bubble style logo
+- Dark theme: pure dark navy background with green accents
+- Light theme: soft green tint with green text and icons
+- Added About screen with app info, tech stack and developer details
+- Added Notifications screen with chapter and follower alert toggles
+- Added Privacy Policy screen
+- Fixed dark mode login/signup background
 
 ### v1.2.0
 - Redesigned UI with vibrant coral, teal and gold theme
