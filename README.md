@@ -18,7 +18,8 @@ mangabd/
 │   │   ├── models/
 │   │   │   ├── manga_model.dart
 │   │   │   ├── chapter_model.dart
-│   │   │   └── user_model.dart
+│   │   │   ├── user_model.dart
+│   │   │   └── chat_model.dart
 │   │   ├── services/
 │   │   │   ├── auth/
 │   │   │   │   └── auth_service.dart
@@ -39,6 +40,9 @@ mangabd/
 │   │   │   │   └── bookmarks_screen.dart
 │   │   │   ├── reader/
 │   │   │   │   └── reader_screen.dart
+│   │   │   ├── chat/
+│   │   │   │   ├── chat_list_screen.dart
+│   │   │   │   └── chat_screen.dart
 │   │   │   ├── creator/
 │   │   │   │   ├── creator_dashboard_screen.dart
 │   │   │   │   ├── add_manga_screen.dart
@@ -87,6 +91,8 @@ mangabd/
 | Edit Profile Username | ✅ Done |
 | Profile Picture Upload | ✅ Done |
 | Dark / Light Theme Toggle | ✅ Done |
+| Real-time Chat (one-to-one messaging) | ✅ Done |
+| Unread Message Badge | ✅ Done |
 | About Screen | ✅ Done |
 | Notifications Settings | ✅ Done |
 | Privacy Policy Screen | ✅ Done |
@@ -145,37 +151,53 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    match /mangas/{mangaId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-
-      match /chapters/{chapterId} {
-        allow read: if true;
-        allow write: if request.auth != null;
-      }
-    }
-
     match /users/{userId} {
       allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /mangas/{mangaId} {
+      allow read: if request.auth != null;
       allow write: if request.auth != null;
+    }
 
-      match /bookmarks/{bookmarkId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
+    match /mangas/{mangaId}/chapters/{chapterId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
 
-      match /following/{followingId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
+    match /users/{userId}/bookmarks/{bookmarkId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
 
-      match /followers/{followerId} {
-        allow read, write: if request.auth != null;
-      }
+    match /users/{userId}/following/{followId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /users/{userId}/followers/{followerId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /conversations/{conversationId} {
+      allow read, write: if request.auth != null;
+    }
+
+    match /conversations/{conversationId}/messages/{messageId} {
+      allow read, write: if request.auth != null;
     }
   }
 }
 ```
 
-### 5. New User Firestore Document Fields
+### 5. Firestore Indexes
+
+Go to Firestore → Indexes → Create index:
+
+| Collection | Field 1 | Field 2 | Query Scope |
+| --- | --- | --- | --- |
+| `conversations` | `participantIds` (Arrays) | `lastMessageAt` (Descending) | Collection |
+
+### 6. New User Firestore Document Fields
 
 When a new user signs up, the following fields are automatically created in their Firestore document:
 
@@ -187,13 +209,11 @@ totalWorks, totalChaptersUploaded
 
 > **Note:** If you have existing users created before v1.1.0, manually add the missing numeric fields (`followersCount`, `followingCount`, `bookmarksCount`, `chaptersRead`, `totalWorks`, `totalChaptersUploaded`) as `int64` with value `0` in Firestore Console.
 
-> **Note (v1.2.0):** If a user exists in Firebase Auth but has no Firestore document (e.g. accounts created before v1.0.0), the app will now automatically create their Firestore document on login. No manual action needed.
+> **Note (v1.2.0):** If a user exists in Firebase Auth but has no Firestore document, the app will now automatically create their Firestore document on login.
 
-> **Note (v1.4.0):** Fixed a crash on Android where Firestore returned numeric fields as `double` instead of `int`. If users had login issues on Android, this is now resolved.
+> **Note (v1.4.0):** Fixed a crash on Android where Firestore returned numeric fields as `double` instead of `int`.
 
-### 6. Android SHA-1 Setup
-
-To enable Firebase Authentication on Android builds, add your debug SHA-1 fingerprint to Firebase:
+### 7. Android SHA-1 Setup
 
 ```
 cd android
@@ -202,13 +222,13 @@ cd android
 
 Copy the SHA1 value and add it in Firebase Console → Project Settings → Your Apps → Android app → Add fingerprint. Then download the updated `google-services.json` and replace it in `android/app/`.
 
-### 7. Flutter setup
+### 8. Flutter setup
 
 ```
 flutter pub get
 ```
 
-### 8. Run the app
+### 9. Run the app
 
 ```
 flutter run
@@ -245,24 +265,29 @@ APK will be at `build/app/outputs/flutter-apk/app-release.apk`
 
 ## Changelog
 
+### v1.5.0
+- Added real-time one-to-one chat system
+- Added chat icon in HomeScreen AppBar replacing theme toggle
+- Added unread message badge on chat icon
+- Added ChatListScreen with conversation list and user search
+- Added ChatScreen with message bubbles, timestamps and date labels
+- Updated Firestore security rules for conversations and messages
+- Added Firestore composite index for conversations query
+
 ### v1.4.0
 - Fixed Android login crash caused by Firestore returning double instead of int
 - Fixed Android authentication by adding SHA-1 fingerprint to Firebase
-- Improved login error messages — now shows actual Firebase error reason
-- Added GitHub profile link in About screen for developer
+- Improved login error messages
+- Added GitHub profile link in About screen
 
 ### v1.3.0
-- Redesigned app with green (#00C853) theme matching new logo
+- Redesigned app with green (#00C853) theme
 - New speech bubble style logo
-- Dark theme: pure dark navy background with green accents
-- Light theme: soft green tint with green text and icons
-- Added About screen with app info, tech stack and developer details
-- Added Notifications screen with chapter and follower alert toggles
-- Added Privacy Policy screen
+- Added About, Notifications and Privacy Policy screens
 - Fixed dark mode login/signup background
 
 ### v1.2.0
-- Redesigned UI with vibrant coral, teal and gold theme
+- Redesigned UI
 - Fixed login failure for accounts missing a Firestore document
 - Auto-creates Firestore document on login if missing
 
