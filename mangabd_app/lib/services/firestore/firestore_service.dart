@@ -50,8 +50,7 @@ class FirestoreService {
 
     await _firestore.collection('users').doc(creatorId).update({
       'totalWorks': FieldValue.increment(-1),
-      'totalChaptersUploaded':
-          FieldValue.increment(-chaptersSnap.docs.length),
+      'totalChaptersUploaded': FieldValue.increment(-chaptersSnap.docs.length),
     });
 
     final usersSnap = await _firestore.collection('users').get();
@@ -337,6 +336,7 @@ class FirestoreService {
         currentUserId: currentUserPhoto,
         otherUserId: otherUserPhoto,
       },
+      nicknames: {},
       lastMessage: '',
       lastSenderId: '',
       lastMessageAt: DateTime.now(),
@@ -361,6 +361,15 @@ class FirestoreService {
             .toList());
   }
 
+  Stream<ConversationModel> getConversationStream(String conversationId) {
+    return _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .snapshots()
+        .where((doc) => doc.exists)
+        .map((doc) => ConversationModel.fromMap(doc.data()!));
+  }
+
   Stream<List<MessageModel>> getMessages(String conversationId) {
     return _firestore
         .collection('conversations')
@@ -379,6 +388,11 @@ class FirestoreService {
     required String senderName,
     required String text,
     required String otherUserId,
+    MessageType type = MessageType.text,
+    String? mediaUrl,
+    String? replyToId,
+    String? replyToText,
+    String? replyToSenderName,
   }) async {
     final messageId = DateTime.now().millisecondsSinceEpoch.toString();
     final message = MessageModel(
@@ -387,6 +401,11 @@ class FirestoreService {
       senderName: senderName,
       text: text,
       createdAt: DateTime.now(),
+      type: type,
+      mediaUrl: mediaUrl,
+      replyToId: replyToId,
+      replyToText: replyToText,
+      replyToSenderName: replyToSenderName,
     );
 
     await _firestore
@@ -396,11 +415,93 @@ class FirestoreService {
         .doc(messageId)
         .set(message.toMap());
 
+    final displayText = type == MessageType.image
+        ? '📷 Photo'
+        : type == MessageType.video
+            ? '🎥 Video'
+            : text;
+
     await _firestore.collection('conversations').doc(conversationId).update({
-      'lastMessage': text,
+      'lastMessage': displayText,
       'lastSenderId': senderId,
       'lastMessageAt': DateTime.now().toIso8601String(),
       'unreadCount.$otherUserId': FieldValue.increment(1),
+    });
+  }
+
+  Future<void> editMessage({
+    required String conversationId,
+    required String messageId,
+    required String newText,
+  }) async {
+    await _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .doc(messageId)
+        .update({
+      'text': newText,
+      'isEdited': true,
+    });
+  }
+
+  Future<void> deleteMessage({
+    required String conversationId,
+    required String messageId,
+  }) async {
+    await _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .doc(messageId)
+        .update({
+      'isDeleted': true,
+      'text': 'This message was deleted',
+      'mediaUrl': null,
+    });
+  }
+
+  Future<void> toggleReaction({
+    required String conversationId,
+    required String messageId,
+    required String emoji,
+    required String userId,
+  }) async {
+    final ref = _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .doc(messageId);
+
+    final doc = await ref.get();
+    if (!doc.exists) return;
+
+    final data = doc.data()!;
+    final rawReactions = Map<String, dynamic>.from(data['reactions'] ?? {});
+    final users = List<String>.from(rawReactions[emoji] ?? []);
+
+    if (users.contains(userId)) {
+      users.remove(userId);
+    } else {
+      users.add(userId);
+    }
+
+    if (users.isEmpty) {
+      rawReactions.remove(emoji);
+    } else {
+      rawReactions[emoji] = users;
+    }
+
+    await ref.update({'reactions': rawReactions});
+  }
+
+  Future<void> updateNickname({
+    required String conversationId,
+    required String userId,
+    required String nickname,
+  }) async {
+    await _firestore.collection('conversations').doc(conversationId).update({
+      'nicknames.$userId': nickname,
     });
   }
 

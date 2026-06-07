@@ -2,7 +2,7 @@ name: mangabd_app
 description: "MangaBD - A manga reading app."
 publish_to: "none"
 
-version: 1.0.0+1
+version: 1.5.0+5
 
 environment:
   sdk: ^3.11.0
@@ -20,6 +20,9 @@ dependencies:
   http: ^1.6.0
   shared_preferences: ^2.3.2
   url_launcher: ^6.3.1
+  emoji_picker_flutter: ^4.4.0
+  video_player: ^2.9.2
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
