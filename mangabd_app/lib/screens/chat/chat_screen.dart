@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 import '../../models/chat_model.dart';
 import '../../services/firestore/firestore_service.dart';
 import '../../services/storage/storage_service.dart';
+import 'chat_info_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final ConversationModel conversation;
@@ -80,6 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _sendMessage() async {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
+
     _messageController.clear();
 
     if (_editingMessage != null) {
@@ -301,97 +303,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void _showNicknameDialog(bool isDark) {
-    final myNickController = TextEditingController(
-      text: _conversation.nicknames[widget.currentUserId] ?? '',
-    );
-    final otherNickController = TextEditingController(
-      text: _conversation.nicknames[_otherUserId] ?? '',
-    );
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1A1D2E) : Colors.white,
-        title: const Text(
-          'Change Nicknames',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: myNickController,
-              decoration: InputDecoration(
-                labelText: 'Your nickname',
-                labelStyle: const TextStyle(color: Color(0xFF4A7A55)),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF00C853)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.grey.withValues(alpha: 0.3),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: otherNickController,
-              decoration: InputDecoration(
-                labelText: '${widget.otherUserName}\'s nickname',
-                labelStyle: const TextStyle(color: Color(0xFF4A7A55)),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF00C853)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.grey.withValues(alpha: 0.3),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Color(0xFF4A7A55)),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              if (myNickController.text.trim().isNotEmpty) {
-                await _firestoreService.updateNickname(
-                  conversationId: widget.conversation.id,
-                  userId: widget.currentUserId,
-                  nickname: myNickController.text.trim(),
-                );
-              }
-              if (otherNickController.text.trim().isNotEmpty) {
-                await _firestoreService.updateNickname(
-                  conversationId: widget.conversation.id,
-                  userId: _otherUserId,
-                  nickname: otherNickController.text.trim(),
-                );
-              }
-            },
-            child: const Text(
-              'Save',
-              style: TextStyle(
-                color: Color(0xFF00C853),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   String _formatTime(DateTime dt) {
     final hour = dt.hour.toString().padLeft(2, '0');
     final minute = dt.minute.toString().padLeft(2, '0');
@@ -483,11 +394,22 @@ class _ChatScreenState extends State<ChatScreen> {
             actions: [
               IconButton(
                 icon: const Icon(
-                  Icons.edit_note_rounded,
+                  Icons.info_outline_rounded,
                   color: Color(0xFF00C853),
                 ),
-                onPressed: () => _showNicknameDialog(isDark),
-                tooltip: 'Change nicknames',
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatInfoScreen(
+                      conversation: _conversation,
+                      currentUserId: widget.currentUserId,
+                      otherUserId: _otherUserId,
+                      otherUserName: widget.otherUserName,
+                      otherUserPhoto: widget.otherUserPhoto,
+                    ),
+                  ),
+                ),
+                tooltip: 'Chat Info',
               ),
             ],
           ),

@@ -340,10 +340,7 @@ class FirestoreService {
       lastMessage: '',
       lastSenderId: '',
       lastMessageAt: DateTime.now(),
-      unreadCount: {
-        currentUserId: 0,
-        otherUserId: 0,
-      },
+      unreadCount: {currentUserId: 0, otherUserId: 0},
     );
 
     await ref.set(conversation.toMap());
@@ -394,6 +391,18 @@ class FirestoreService {
     String? replyToText,
     String? replyToSenderName,
   }) async {
+    final convDoc = await _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .get();
+    if (convDoc.exists) {
+      final blockedBy =
+          List<String>.from(convDoc.data()?['blockedBy'] ?? []);
+      if (blockedBy.contains(otherUserId)) {
+        return;
+      }
+    }
+
     final messageId = DateTime.now().millisecondsSinceEpoch.toString();
     final message = MessageModel(
       id: messageId,
@@ -439,10 +448,7 @@ class FirestoreService {
         .doc(conversationId)
         .collection('messages')
         .doc(messageId)
-        .update({
-      'text': newText,
-      'isEdited': true,
-    });
+        .update({'text': newText, 'isEdited': true});
   }
 
   Future<void> deleteMessage({
@@ -527,6 +533,76 @@ class FirestoreService {
         total += (unread[userId] as num? ?? 0).toInt();
       }
       return total;
+    });
+  }
+
+  Future<List<MessageModel>> getMediaMessages(String conversationId) async {
+    final snap = await _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .orderBy('createdAt', descending: true)
+        .get();
+    return snap.docs
+        .map((doc) => MessageModel.fromMap(doc.data()))
+        .where((msg) =>
+            msg.type == MessageType.image || msg.type == MessageType.video)
+        .toList();
+  }
+
+  Future<ConversationModel?> getConversationOnce(
+      String conversationId) async {
+    final doc = await _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .get();
+    if (doc.exists) return ConversationModel.fromMap(doc.data()!);
+    return null;
+  }
+
+  Future<bool> isBlocked(String currentUserId, String otherUserId) async {
+    try {
+      final convId = _conversationId(currentUserId, otherUserId);
+      final doc =
+          await _firestore.collection('conversations').doc(convId).get();
+      if (!doc.exists) return false;
+      final blockedBy =
+          List<String>.from(doc.data()?['blockedBy'] ?? []);
+      return blockedBy.contains(currentUserId);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> toggleBlock(String currentUserId, String otherUserId) async {
+    final convId = _conversationId(currentUserId, otherUserId);
+    final ref = _firestore.collection('conversations').doc(convId);
+    final doc = await ref.get();
+    if (!doc.exists) return;
+    final blockedBy =
+        List<String>.from(doc.data()?['blockedBy'] ?? []);
+    if (blockedBy.contains(currentUserId)) {
+      blockedBy.remove(currentUserId);
+    } else {
+      blockedBy.add(currentUserId);
+    }
+    await ref.update({'blockedBy': blockedBy});
+  }
+
+  Future<void> clearChat(String conversationId) async {
+    final snap = await _firestore
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .get();
+    final batch = _firestore.batch();
+    for (final doc in snap.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+    await _firestore.collection('conversations').doc(conversationId).update({
+      'lastMessage': '',
+      'lastSenderId': '',
     });
   }
 }
