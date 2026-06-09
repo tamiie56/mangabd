@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/chat_model.dart';
 import '../../services/firestore/firestore_service.dart';
+import '../profile/user_profile_screen.dart';
 
 class ChatInfoScreen extends StatefulWidget {
   final ConversationModel conversation;
@@ -336,7 +337,13 @@ class _ChatInfoScreenState extends State<ChatInfoScreen> {
                   icon: Icons.person_outline_rounded,
                   label: 'Profile',
                   isDark: isDark,
-                  onTap: () {},
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          UserProfileScreen(userId: widget.otherUserId),
+                    ),
+                  ),
                 ),
               ],
             ),
